@@ -23,5 +23,6 @@
             "version": "*",
             "importance": "required"
 		}
-	]
+	],
+	"repository": "https://github.com/Uproxide/Texture-Workshop"
 }
