@@ -1,6 +1,10 @@
 {
-	"geode": "2.0.0-beta.22",
-	"gd": "2.204",
+	"geode": "2.0.0-beta.26",
+	"gd": {
+		"win": "2.204",
+		"android": "2.205",
+		"mac": "2.200"
+	},
 	"version": "v1.0.0-beta.1",
 	"id": "uproxide.textures",
 	"name": "Texture Workshop",
