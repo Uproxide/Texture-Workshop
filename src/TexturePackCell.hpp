@@ -43,6 +43,7 @@ class TexturePackCell : public CCLayerColor {
             this->setContentSize(ccp(315, 35));
             this->setAnchorPoint(ccp(0, 1));
             this->setPositionY(207);
+            float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
 
             creator = tpCreator;
             name = tpName;
@@ -86,7 +87,7 @@ class TexturePackCell : public CCLayerColor {
                 web::AsyncWebRequest()
                     .fetch(icon)
                     .bytes()
-                    .then([this, texturePackIconSpr](geode::ByteVector const& data) {
+                    .then([this, texturePackIconSpr, scale](geode::ByteVector const& data) {
                         imgData = data;
                         auto image = Ref(new CCImage());
                         image->initWithImageData(const_cast<uint8_t*>(data.data()),data.size());
@@ -95,6 +96,7 @@ class TexturePackCell : public CCLayerColor {
                         image->release();
                         this->autorelease();
                         texturePackIconSpr->initWithTexture(texture);
+                        texturePackIconSpr->setScale(0.35 * scale);
                     })
                     .expect([this](std::string const& error) {
                         
@@ -107,6 +109,7 @@ class TexturePackCell : public CCLayerColor {
                 image->release();
                 this->autorelease();
                 texturePackIconSpr->initWithTexture(texture);
+                texturePackIconSpr->setScale(0.35 * scale);
             }
             
 
