@@ -10,6 +10,7 @@ using namespace geode::prelude;
 #include <cctype>
 #include <algorithm>
 #include <matjson.hpp>
+#include "JsonManager.hpp"
 
 TextureWorkshopLayer* TextureWorkshopLayer::create() {
     auto ret = new TextureWorkshopLayer();
@@ -48,23 +49,22 @@ bool TextureWorkshopLayer::init() {
 
     m_background = CCSprite::createWithSpriteFrameName("TWS_Background.png"_spr);
     m_background->setAnchorPoint({ 0.f, 0.f });
+    m_background->setScale(1.5);
     addChild(m_background, -2);
+
+    m_background->setScaleX((winSize.width + 10.f) / m_background->getTextureRect().size.width);
+    m_background->setScaleY((winSize.height + 10.f) / m_background->getTextureRect().size.height);
+    m_background->setPosition(ccp(-5, -5));
 
     auto bg = cocos2d::extension::CCScale9Sprite::create("square02_small.png");
 
     this->addChild(bg);
 
     bg->setPosition(winSize / 2);
-    bg->setContentHeight(255);
-    bg->setContentWidth(380);
+    bg->setContentHeight(245);
+    bg->setContentWidth(370);
     bg->setOpacity(135);
-    
-
-    auto logo = CCSprite::createWithSpriteFrameName("TWS_Logo.png"_spr);
-    this->addChild(logo);
-    logo->setPosition(winSize / 2);
-    logo->setPositionY(director->getScreenTop() - 20);
-    logo->setScale(0.8);
+    bg->setPositionY(bg->getPositionY() - 15);
 
     outline = CCSprite::createWithSpriteFrameName("TWS_Outline.png"_spr);
     this->addChild(outline);
@@ -72,14 +72,7 @@ bool TextureWorkshopLayer::init() {
     outline->setScale(1.2);
     outline->setZOrder(1);
 
-    auto logo2 = CCSprite::createWithSpriteFrameName("TWS_Workshop.png"_spr);
-    this->addChild(logo2);
-    logo2->setPosition(winSize / 2);
-    logo2->setPositionY(director->getScreenTop() - 35);
-    logo2->setScale(0.5);
-    logo2->setZOrder(2);
-
-    CCMenu* buttonMenu = CCMenu::create();
+    buttonMenu = CCMenu::create();
     addChild(buttonMenu, 1);
 
     auto discordSprite = CCSprite::createWithSpriteFrameName("gj_discordIcon_001.png");
@@ -100,6 +93,27 @@ bool TextureWorkshopLayer::init() {
     );
     buttonMenu->addChild(supportButton);
     supportButton->setPositionY(discordButton->getPositionY() + 35);
+
+    auto refreshSpr = CCSprite::createWithSpriteFrameName("TWS_RefreshButton.png"_spr);
+    refreshSpr->setScale(0.8);
+    refreshButton = CCMenuItemSpriteExtra::create(
+        refreshSpr,
+        this,
+        menu_selector(TextureWorkshopLayer::onRefresh)
+    );
+    buttonMenu->addChild(refreshButton);
+    refreshButton->setPosition(-50, 195);
+    refreshButton->setVisible(false);
+
+    auto filesSpr = CCSprite::createWithSpriteFrameName("TWS_FileButton.png"_spr);
+    filesSpr->setScale(0.8);
+    auto filesBtn = CCMenuItemSpriteExtra::create(
+        filesSpr,
+        this,
+        menu_selector(TextureWorkshopLayer::onPacksFolder)
+    );
+    buttonMenu->addChild(filesBtn);
+    filesBtn->setPosition(-50, 235.5);
 
     getTexturePacks();
 
@@ -132,16 +146,38 @@ void TextureWorkshopLayer::onSupport(CCObject*) {
     );
 }
 
+void TextureWorkshopLayer::onRefresh(CCObject*) {
+    JsonManager::downloaded = false;
+    scroll->removeFromParent();
+    tpAmount->removeFromParent();
+    refreshButton->setVisible(false);
+    scroll = nullptr;
+    getTexturePacks();
+}
+
+void TextureWorkshopLayer::onPacksFolder(CCObject*) {
+    utils::file::openFolder(Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir());
+}
+
 void TextureWorkshopLayer::getTexturePacks() {
-    web::AsyncWebRequest()
-        .fetch("https://uproxide.xyz/api/v1/tws/getTPs.php")
-        .text()
-        .then([this](std::string const& json) {
-            parseJson(json);
-        })
-        .expect([this](std::string const& json) {
-            log::error("something went wrong :3");
-        });
+
+    log::info("{}", JsonManager::tpJson);
+
+    if (!JsonManager::downloaded) {
+        web::AsyncWebRequest()
+            .fetch("https://uproxide.xyz/api/v1/tws/getTPs.php")
+            .text()
+            .then([this](std::string const& json) {
+                parseJson(json);
+                JsonManager::downloaded = true;
+            })
+            .expect([this](std::string const& json) {
+                log::error("something went wrong :3");
+            });
+    } else {
+        onGetTPsFinished();
+    }
+    
 }
 
 void TextureWorkshopLayer::parseJson(std::string str) {
@@ -149,13 +185,12 @@ void TextureWorkshopLayer::parseJson(std::string str) {
         empty = true;
     } else {
         try {
-            tpJson = matjson::parse(str);
-            log::info("{}", tpJson);
+            JsonManager::tpJson = matjson::parse(str);
+            log::info("{}", JsonManager::tpJson);
         } catch (const std::exception& e) {
             log::error("Failed to parse JSON: {}", e.what());
         }
     }
-
     onGetTPsFinished();
 }
 
@@ -165,7 +200,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
 
     bool thing = false;
 
-    scroll = ScrollLayer::create(ccp(317, 211));
+    scroll = ScrollLayer::create(ccp(313, 207));
 	scroll->setAnchorPoint(ccp(0, 0));
     scroll->ignoreAnchorPointForPosition(false);
 
@@ -174,24 +209,29 @@ void TextureWorkshopLayer::onGetTPsFinished() {
     this->outline->addChild(scroll);
 
     scroll->setZOrder(-1);
-    scroll->setPositionY(0.5);
+    scroll->setPositionX(81);
+    scroll->setPositionY(19);
 
 	
 	scroll->m_contentLayer->removeAllChildren();
 	
-	if (tpJson.is_object()) {
-	    for (const auto& pair : tpJson.as_object()) {
+	if (JsonManager::tpJson.is_object()) {
+	    for (const auto& pair : JsonManager::tpJson.as_object()) {
 	        const auto& tpObject = pair.second;
             std::string tpName;
             std::string tpCreator;
             std::string tpDownloadURL;
             std::string tpDownloadVersion;
+            std::string tpIcon;
+            std::string tpDesc;
             bool featured;
 
             tpName = tpObject["packName"].as_string();
             tpCreator = tpObject["packCreator"].as_string();
             tpDownloadURL = tpObject["downloadLink"].as_string();
             tpDownloadVersion = tpObject["packVersion"].as_string();
+            tpIcon = tpObject["packLogo"].as_string();
+            tpDesc = tpObject["packDescription"].as_string();
 
             if (tpObject["packFeature"].as_int() == 1) {
                 featured = true;
@@ -203,12 +243,12 @@ void TextureWorkshopLayer::onGetTPsFinished() {
 
             tpCount += 1;
 
-	        auto cell = TexturePackCell::create(tpName, tpCreator, tpDownloadURL, tpDownloadVersion, featured, thing);
+	        auto cell = TexturePackCell::create(tpName, tpCreator, tpDownloadURL, tpDownloadVersion, tpIcon, tpDesc, featured, thing);
 	        cell->setPositionY(basePosY);
 	        scroll->m_contentLayer->addChild(cell);
 	        scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
 	
-	        float height = std::max<float>(scroll->getContentSize().height, 45 * scroll->m_contentLayer->getChildrenCount());
+	        float height = std::max<float>(scroll->getContentSize().height, 35 * scroll->m_contentLayer->getChildrenCount());
 	
 	        scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
 	
@@ -219,7 +259,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
 	
 			for (auto* obj : objects) {
 	            i++;
-				obj->setPositionY(height - (45 * i));
+				obj->setPositionY(height - (35 * i));
 	
 			}
 
@@ -229,7 +269,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
 
         std::string countThing = fmt::format("{} Texture Packs", tpCount);
 
-        auto tpAmount = CCLabelBMFont::create(
+        tpAmount = CCLabelBMFont::create(
             countThing.c_str(),
             "goldFont.fnt"
         );
@@ -237,7 +277,8 @@ void TextureWorkshopLayer::onGetTPsFinished() {
         tpAmount->setPosition(winSize / 2);
         tpAmount->setScale(0.475);
         tpAmount->setAnchorPoint(ccp(0.5, 1));
-        tpAmount->setPositionY(director->getScreenBottom() + 30);
+        tpAmount->setPositionY(director->getScreenBottom() + 13);
+        refreshButton->setVisible(true);
             
     }
 }

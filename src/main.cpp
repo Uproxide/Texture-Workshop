@@ -5,6 +5,7 @@ using namespace geode::prelude;
 #include <Geode/modify/MenuLayer.hpp>
 #include "TextureWorkshopLayer.hpp"
 #include <Geode/utils/web.hpp>
+#include <matjson.hpp>
 
 class $modify(MyMenuLayer, MenuLayer) {
 	bool init() {
@@ -12,20 +13,20 @@ class $modify(MyMenuLayer, MenuLayer) {
 			return false;
 		}
 
-		
 
-		auto myButton = CCMenuItemSpriteExtra::create(
+		auto wsButton = CCMenuItemSpriteExtra::create(
 			CCSprite::createWithSpriteFrameName("TWS_MainButton.png"_spr),
 			this,
 			menu_selector(MyMenuLayer::onMyButton)
 		);
 
-		auto menu = this->getChildByID("bottom-menu");
-		menu->addChild(myButton);
+		auto menu = this->getChildByID("right-side-menu");
+		menu->addChild(wsButton);
 
-		myButton->setID("workshop-button"_spr);
+		wsButton->setID("workshop-button"_spr);
 
 		menu->updateLayout();
+
 
 		return true;
 	}

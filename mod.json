@@ -15,7 +15,10 @@
 			"TWSSheet": [
 				"resources/TWSSheet/*.png"
 			]
-		}
+		},
+		"sprites": [
+			"resources/*.png"
+		]
 	},
 	"dependencies": [
 		{
