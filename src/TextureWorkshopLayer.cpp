@@ -136,11 +136,11 @@ void TextureWorkshopLayer::onDiscord(CCObject*) {
 void TextureWorkshopLayer::onSupport(CCObject*) {
     geode::createQuickPopup(
         "Support Me",
-        "Making mods like this is fun, and thats thanks to you! if you want to support my shinanigans, Please support me on Patreon!",
+        "Making mods like this is fun, and thats thanks to you! if you want to support my shinanigans, Please support me on Ko-Fi!",
         "No Thanks", "Ok",
         [](auto, bool btn2) {
             if (btn2) {
-                geode::utils::web::openLinkInBrowser("https://www.patreon.com/uproxide");
+                geode::utils::web::openLinkInBrowser("https://ko-fi.com/uproxide");
             }
         }
     );
