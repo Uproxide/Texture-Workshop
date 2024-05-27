@@ -13,7 +13,6 @@ class $modify(MyMenuLayer, MenuLayer) {
 			return false;
 		}
 
-
 		auto wsButton = CCMenuItemSpriteExtra::create(
 			CCSprite::createWithSpriteFrameName("TWS_MainButton.png"_spr),
 			this,

@@ -25,4 +25,5 @@ public:
     void onSupport(CCObject*);
     void onPacksFolder(CCObject*);
     void onRefresh(CCObject*);
+    void onCredits(CCObject*);
 };

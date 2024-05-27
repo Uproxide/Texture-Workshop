@@ -10,6 +10,7 @@ using namespace geode::prelude;
 #include <cctype>
 #include <algorithm>
 #include <matjson.hpp>
+#include <Geode/ui/GeodeUI.hpp>
 #include "JsonManager.hpp"
 
 TextureWorkshopLayer* TextureWorkshopLayer::create() {
@@ -74,6 +75,9 @@ bool TextureWorkshopLayer::init() {
 
     buttonMenu = CCMenu::create();
     addChild(buttonMenu, 1);
+    
+    buttonMenu->setPosition(0, 0);
+    buttonMenu->setContentSize(winSize);
 
     auto discordSprite = CCSprite::createWithSpriteFrameName("gj_discordIcon_001.png");
     auto discordButton = CCMenuItemSpriteExtra::create(
@@ -82,8 +86,7 @@ bool TextureWorkshopLayer::init() {
         menu_selector(TextureWorkshopLayer::onDiscord)
     );
     buttonMenu->addChild(discordButton);
-
-    buttonMenu->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 20));
+    discordButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 20));
 
     auto supportSprite = CCSprite::createWithSpriteFrameName("geode.loader/gift.png");
     auto supportButton = CCMenuItemSpriteExtra::create(
@@ -92,7 +95,17 @@ bool TextureWorkshopLayer::init() {
         menu_selector(TextureWorkshopLayer::onSupport)
     );
     buttonMenu->addChild(supportButton);
-    supportButton->setPositionY(discordButton->getPositionY() + 35);
+    supportButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 55));
+
+    auto creditsSprite = CCSprite::createWithSpriteFrameName("TWS_Credits.png"_spr);
+    creditsSprite->setScale(0.7);
+    auto creditsButton = CCMenuItemSpriteExtra::create(
+        creditsSprite,
+        this,
+        menu_selector(TextureWorkshopLayer::onCredits)
+    );
+    buttonMenu->addChild(creditsButton);
+    creditsButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 90));
 
     auto refreshSpr = CCSprite::createWithSpriteFrameName("TWS_RefreshButton.png"_spr);
     refreshSpr->setScale(0.8);
@@ -102,7 +115,7 @@ bool TextureWorkshopLayer::init() {
         menu_selector(TextureWorkshopLayer::onRefresh)
     );
     buttonMenu->addChild(refreshButton);
-    refreshButton->setPosition(-50, 195);
+    refreshButton->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 65));
     refreshButton->setVisible(false);
 
     auto filesSpr = CCSprite::createWithSpriteFrameName("TWS_FileButton.png"_spr);
@@ -113,9 +126,30 @@ bool TextureWorkshopLayer::init() {
         menu_selector(TextureWorkshopLayer::onPacksFolder)
     );
     buttonMenu->addChild(filesBtn);
-    filesBtn->setPosition(-50, 235.5);
+    filesBtn->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 25));
 
     getTexturePacks();
+
+    if (auto available = Mod::get()->hasAvailableUpdate()) {
+         auto popup = createQuickPopup(
+            "Update Available!",
+            fmt::format(
+                "<cl>Texture Workshop</c> has a new update!\n<ca>{}</c> -> <cg>{}</c>\n\n"
+                "Would you like to <cj>Update?</c>",
+                Mod::get()->getVersion(),
+                available.value()
+            ),
+            "OK", "Update",
+            [](auto, bool btn2) {
+                if (btn2) {
+                    openInfoPopup(Mod::get());
+                }
+            },
+            false
+        );
+        popup->m_scene = this;
+        popup->show();
+    }
 
     return true;
 }
@@ -144,6 +178,14 @@ void TextureWorkshopLayer::onSupport(CCObject*) {
             }
         }
     );
+}
+
+void TextureWorkshopLayer::onCredits(CCObject*) {
+    FLAlertLayer::create(
+        "Credits",
+        "<cg>Uproxide</c> - Main Developer\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
+        "Ok"
+    )->show();
 }
 
 void TextureWorkshopLayer::onRefresh(CCObject*) {
