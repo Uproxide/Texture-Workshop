@@ -207,7 +207,7 @@ void TextureWorkshopLayer::getTexturePacks() {
     
     if (!JsonManager::downloaded) {
         web::AsyncWebRequest()
-            .fetch("http://skibidi.website/getTPs.php")
+            .fetch("https://raw.githubusercontent.com/Uproxide/Texture-Workshop/main/test.json")
             .text()
             .then([this](std::string const& json) {
                 parseJson(json);
