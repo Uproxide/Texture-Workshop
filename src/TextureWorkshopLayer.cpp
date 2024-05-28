@@ -206,9 +206,8 @@ void TextureWorkshopLayer::getTexturePacks() {
     log::info("{}", JsonManager::tpJson);
     std::string url = "https://uproxide.xyz/api/v1/tws/getTPs.php";
 
-    #ifdef GEODE_IS_IOS {
+    #ifdef GEODE_IS_IOS
         url = "https://skibidi.website/getTPs.php"
-    } 
     #endif
 
     if (!JsonManager::downloaded) {
