@@ -238,7 +238,7 @@ void TextureWorkshopLayer::getTexturePacks() {
                 JsonManager::downloaded = true;
             })
             .expect([this](std::string const& json) {
-                log::error("something went wrong :3");
+                log::error("something went wrong {} :3", json);
             });
     } else {
         onGetTPsFinished();
