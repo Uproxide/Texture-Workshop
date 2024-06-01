@@ -6,36 +6,24 @@
 #include <Geode/ui/TextInput.hpp>
 #include <cctype>
 #include <algorithm>
+#include "TexturePack.hpp"
 
 using namespace geode::prelude;
 
-class TexturePackInfo : public Popup<std::string, std::string, std::string, std::string, std::string, std::string, geode::ByteVector, bool> {
+
+class TexturePackInfo : public Popup<TexturePack*> {
 public:
-    std::string url;
-    std::string name;
-    std::string creator;
-    std::string icon;
-    std::string version;
-    std::string description;
-    bool feature;
 
-    geode::ByteVector iconImg;
+    TexturePack* texturePack;
 
-    bool setup(std::string tpName, std::string tpCreator, std::string tpDownloadLink, std::string tpIcon, std::string tpDownloadVersion, std::string tpDesc, geode::ByteVector iconData, bool featured) {
+    bool setup(TexturePack* tp) {
         log::info("hai");
 
         m_noElasticity = true;
 
-        creator = tpCreator;
-        name = tpName;
-        url = tpDownloadLink;
-        version = tpDownloadVersion;
-        feature = featured;
-        icon = tpIcon;
-        iconImg = iconData;
-        description = tpDesc;
+        texturePack = tp;
 
-        ghc::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), name);
+        ghc::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), tp->name);
 
         auto winSize = CCDirector::get()->getWinSize();
         float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
@@ -48,14 +36,14 @@ public:
         texturePackIconSpr->setPositionX(texturePackIconSpr->getPositionX() - 100);
         texturePackIconSpr->setZOrder(1);
 
-        if (featured) {
+        if (tp->featured) {
             auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
             this->addChild(featuredSpr);
             featuredSpr->setScale(0.65);
             featuredSpr->setPosition(texturePackIconSpr->getPosition());
         }
 
-        auto txtr = CCTextureCache::get()->textureForKey(fmt::format("logo-{}", name).c_str());
+        auto txtr = CCTextureCache::get()->textureForKey(fmt::format("logo-{}", tp->name).c_str());
         this->retain();
 
         if (!txtr) {
@@ -69,7 +57,7 @@ public:
         auto tpNameMenu = CCMenu::create();
 
         auto texturePackName = CCLabelBMFont::create(
-            tpName.c_str(),
+            tp->name.c_str(),
             "bigFont.fnt"
         );
         tpNameMenu->addChild(texturePackName);
@@ -89,7 +77,7 @@ public:
         tpNameMenu->setPositionY(tpNameMenu->getPositionY() + 7);
         
 
-        std::string fullTPCreator = fmt::format("By {}", tpCreator);
+        std::string fullTPCreator = fmt::format("By {}", tp->creator);
 
         auto texturePackCreator = CCLabelBMFont::create(
             fullTPCreator.c_str(),
@@ -110,7 +98,9 @@ public:
         line->setPositionY(line->getPositionY() + 45);
         line->setScale(0.675);
 
-        auto desc = MDTextArea::create(description, ccp(300, 150));
+        std::string fullDesc = fmt::format("# {}\n{}", tp->name, tp->description);
+
+        auto desc = MDTextArea::create(fullDesc, ccp(300, 150));
         this->addChild(desc);
         desc->setPosition(line->getPosition());
         desc->setPositionY(desc->getPositionY() - 81);
@@ -152,9 +142,9 @@ public:
     }
 
     void onDownload(CCObject*) {
-        std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getLoadedMod("geode.texture-loader")->getConfigDir(), name);
+        std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getLoadedMod("geode.texture-loader")->getConfigDir(), texturePack->name);
         web::AsyncWebRequest()
-            .fetch(url)
+            .fetch(texturePack->download)
             .into(fileName)
             .then([this](auto file) {
                 Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
@@ -165,7 +155,7 @@ public:
             })
             .expect([this](std::string const& err) {
                 Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
-                std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), name);
+                std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
                 ghc::filesystem::remove(fileName);
             });
     }
@@ -173,13 +163,13 @@ public:
     void onDelete(CCObject*) {
             geode::createQuickPopup(
                 "Delete Pack",
-                fmt::format("Are you sure you want to delete {}?", name),
+                fmt::format("Are you sure you want to delete {}?", texturePack->name),
                 "Nope", "Yeah",
                 [this](auto, bool btn2) {
                     if (btn2) {
-                        std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), name);
+                        std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
                         ghc::filesystem::remove(fileName);
-                        Notification::create(fmt::format("Deleted {}!", name), CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
+                        Notification::create(fmt::format("Deleted {}!", texturePack->name), CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
                         auto workshopLayer = TextureWorkshopLayer::scene();
                         this->onClose(nullptr);
 		                CCDirector::sharedDirector()->pushScene(workshopLayer);
@@ -190,9 +180,9 @@ public:
 
 
 
-    static TexturePackInfo* create(std::string tpName, std::string tpCreator, std::string tpDownloadLink, std::string tpIcon, std::string tpDownloadVersion, std::string tpDesc, geode::ByteVector iconData, bool featured) {
+    static TexturePackInfo* create(TexturePack* tp) {
         auto ret = new TexturePackInfo();
-        if (ret && ret->initAnchored(342, 240, tpName, tpCreator, tpDownloadLink, tpIcon, tpDownloadVersion, tpDesc, iconData, featured, "TWS_Box.png"_spr)) {
+        if (ret && ret->initAnchored(342, 240, tp, "TWS_Box.png"_spr)) {
             ret->autorelease();
             return ret;
         }

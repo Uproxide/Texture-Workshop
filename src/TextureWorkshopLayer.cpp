@@ -6,7 +6,6 @@ using namespace geode::prelude;
 #include "TexturePackCell.hpp"
 #include <Geode/Geode.hpp>
 #include <Geode/utils/web.hpp>
-#include <Geode/ui/TextInput.hpp>
 #include <cctype>
 #include <algorithm>
 #include <matjson.hpp>
@@ -37,6 +36,8 @@ bool TextureWorkshopLayer::init() {
     auto director = CCDirector::sharedDirector();
     auto winSize = director->getWinSize();
 
+    get = this;
+
     CCSprite* backSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
     CCMenuItemSpriteExtra* backBtn = CCMenuItemSpriteExtra::create(backSpr, this, menu_selector(TextureWorkshopLayer::onClose));
 
@@ -62,8 +63,8 @@ bool TextureWorkshopLayer::init() {
     this->addChild(bg);
 
     bg->setPosition(winSize / 2);
-    bg->setContentHeight(245);
-    bg->setContentWidth(370);
+    bg->setContentHeight(252);
+    bg->setContentWidth(380);
     bg->setOpacity(135);
     bg->setPositionY(bg->getPositionY() - 15);
 
@@ -128,6 +129,22 @@ bool TextureWorkshopLayer::init() {
     buttonMenu->addChild(filesBtn);
     filesBtn->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 25));
 
+    inp = TextInput::create(300, "Search", "chatFont.fnt");
+    inp->setContentHeight(20);
+    inp->setAnchorPoint(ccp(0, 0));
+    inp->ignoreAnchorPointForPosition(false); 
+    this->outline->addChild(inp);
+
+    inp->setPosition(ccp(6, 194.2));
+    inp->hideBG();
+    auto inputNode = inp->getInputNode();
+    inputNode->setPositionY(inputNode->getPositionY() - 5);
+    inputNode->setPositionX(5);
+    inputNode->m_placeholderLabel->setAnchorPoint(ccp(0, 0.5));
+    inp->setDelegate(this);
+    inp->setCommonFilter(CommonFilter::Any);
+    
+
     getTexturePacks();
 
     if (auto available = Mod::get()->hasAvailableUpdate()) {
@@ -183,7 +200,7 @@ void TextureWorkshopLayer::onSupport(CCObject*) {
 void TextureWorkshopLayer::onCredits(CCObject*) {
     FLAlertLayer::create(
         "Credits",
-        "<cg>Uproxide</c> - Main Developer\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
+        "<cg>Uproxide</c> - Main Developer\n<cr>TheSillyDoggo</c> - Help with Searching\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
         "Ok"
     )->show();
 }
@@ -197,13 +214,20 @@ void TextureWorkshopLayer::onRefresh(CCObject*) {
     getTexturePacks();
 }
 
+void TextureWorkshopLayer::onRefreshSearch(CCObject*) {
+    JsonManager::downloaded = true;
+    scroll->removeFromParent();
+    tpAmount->removeFromParent();
+    refreshButton->setVisible(false);
+    scroll = nullptr;
+    getTexturePacks();
+}
+
 void TextureWorkshopLayer::onPacksFolder(CCObject*) {
     utils::file::openFolder(Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir());
 }
 
 void TextureWorkshopLayer::getTexturePacks() {
-
-    log::info("{}", JsonManager::tpJson);
 
     if (!JsonManager::downloaded) {
         web::AsyncWebRequest()
@@ -224,7 +248,7 @@ void TextureWorkshopLayer::getTexturePacks() {
 
 void TextureWorkshopLayer::parseJson(std::string str) {
     if (str == "[]") {
-        empty = true;
+        
     } else {
         try {
             JsonManager::tpJson = matjson::parse(str);
@@ -242,22 +266,24 @@ void TextureWorkshopLayer::onGetTPsFinished() {
 
     bool thing = false;
 
-    scroll = ScrollLayer::create(ccp(313, 207));
+    scroll = ScrollLayer::create(ccp(313, 180));
 	scroll->setAnchorPoint(ccp(0, 0));
     scroll->ignoreAnchorPointForPosition(false);
+
 
     int basePosY = 207;
     int tpCount = 0;
     this->outline->addChild(scroll);
 
     scroll->setZOrder(-1);
-    scroll->setPositionX(81);
-    scroll->setPositionY(19);
+    scroll->setPositionX(0);
+    scroll->setPositionY(8);
+    
 
 	
 	scroll->m_contentLayer->removeAllChildren();
 	
-	if (JsonManager::tpJson.is_object()) {
+	if (JsonManager::tpJson.is_object() && !search) {
 	    for (const auto& pair : JsonManager::tpJson.as_object()) {
 	        const auto& tpObject = pair.second;
             std::string tpName;
@@ -284,8 +310,11 @@ void TextureWorkshopLayer::onGetTPsFinished() {
             thing = !thing;
 
             tpCount += 1;
+            
+            TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, featured);
 
-	        auto cell = TexturePackCell::create(tpName, tpCreator, tpDownloadURL, tpDownloadVersion, tpIcon, tpDesc, featured, thing);
+	        auto cell = TexturePackCell::create(tp, thing);
+            tps.push_back(tp);
 	        cell->setPositionY(basePosY);
 	        scroll->m_contentLayer->addChild(cell);
 	        scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
@@ -320,9 +349,61 @@ void TextureWorkshopLayer::onGetTPsFinished() {
         tpAmount->setScale(0.475);
         tpAmount->setAnchorPoint(ccp(0.5, 1));
         tpAmount->setPositionY(director->getScreenBottom() + 13);
+        tpAmount->setZOrder(5);
         refreshButton->setVisible(true);
-            
     }
+}
+
+void TextureWorkshopLayer::textChanged(CCTextInputNode* p0){
+    searchTPs();
+}
+
+void TextureWorkshopLayer::searchTPs() {
+    auto content = scroll->m_contentLayer;
+
+    bool thing = false;
+
+    content->removeAllChildren();
+
+    for (size_t i = 0; i < tps.size(); i++)
+    {
+        thing = !thing;
+
+        auto name = inp->getString();
+
+        if (inp->getString().starts_with("by:")) {
+            if(utils::string::toLower(tps[i]->creator).find(utils::string::toLower(name.substr(name.find(":") + 1, name.size() - name.find(":")))) != std::string::npos)
+            {
+                auto cell = TexturePackCell::create(tps[i], thing);
+
+                content->addChild(cell);
+            }
+        } else {
+            if (utils::string::toLower(tps[i]->name).find(utils::string::toLower(inp->getString())) != std::string::npos)
+            {
+                auto cell = TexturePackCell::create(tps[i], thing);
+
+                content->addChild(cell);
+            }
+        }
+    }
+
+    float height = std::max<float>(scroll->getContentSize().height, 35 * content->getChildrenCount());
+
+    scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
+	
+	CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
+
+    int i = 0;
+	
+	
+	for (auto* obj : objects) {
+	    i++;
+		obj->setPositionY(height - (35 * i));
+	}
+
+	
+	scroll->moveToTop();
 }
 
 

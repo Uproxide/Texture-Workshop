@@ -6,31 +6,30 @@
 #include <cctype>
 #include <algorithm>
 #include "TexturePackInfo.hpp"
+#include "TextureWorkshopLayer.hpp"
 #include <Geode/utils/file.hpp>
+#include "TexturePack.hpp"
 
 using namespace geode::prelude;
 
 class TexturePackCell : public CCLayerColor {
     public:
 
-        std::string url;
-        std::string name;
-        std::string creator;
-        std::string version;
-        std::string icon;
-        std::string description;
-        bool featured;
         bool thingy;
         int opacity;
 
         geode::ByteVector imgData;
         CCLayerGradient* gradient;
 
-        bool init(std::string tpName, std::string tpCreator, std::string tpDownloadURL, std::string tpDownloadVersion, std::string tpIcon, std::string tpDesc, bool feature, bool thing) {
+        TexturePack* texturePack;
+
+
+        bool init(TexturePack* tp, bool thing) {
             if (!CCLayerColor::init())
                 return false;
 
             thingy = thing;
+            texturePack = tp;
 
             if (thing) {
                 this->setOpacity(100);
@@ -45,25 +44,17 @@ class TexturePackCell : public CCLayerColor {
             this->setPositionY(207);
             float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
 
-            creator = tpCreator;
-            name = tpName;
-            url = tpDownloadURL;
-            version = tpDownloadVersion;
-            featured = feature;
-            icon = tpIcon;
-            description = tpDesc;
-
-            ghc::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), name);
+            ghc::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), tp->name);
 
             gradient = CCLayerGradient::create(ccc4(0, 0, 0, 100), ccc4(0, 255, 0, 100));
             gradient->setContentSize(this->getContentSize());
             gradient->setZOrder(-3);
             gradient->setVector(ccp(90, 0));
 
-            std::string versionSaveThing = fmt::format("{} Version", name);
+            std::string versionSaveThing = fmt::format("{} Version", tp->name);
 
             if (ghc::filesystem::exists(filePath)) {
-                if (Mod::get()->getSavedValue<std::string>(versionSaveThing) == version) {
+                if (Mod::get()->getSavedValue<std::string>(versionSaveThing) == tp->version) {
                     gradient = CCLayerGradient::create(ccc4(0, 0, 0, 100), ccc4(0, 255, 0, 100));
                     gradient->setContentSize(this->getContentSize());
                     gradient->setZOrder(-3);
@@ -81,7 +72,7 @@ class TexturePackCell : public CCLayerColor {
                 
             }
 
-            if (featured) {
+            if (tp->featured) {
                 auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
                 this->addChild(featuredSpr);
                 featuredSpr->setScale(0.35);
@@ -96,18 +87,18 @@ class TexturePackCell : public CCLayerColor {
             texturePackIconSpr->setPositionX(30);
             
 
-            auto txtr = CCTextureCache::get()->textureForKey(fmt::format("logo-{}", name).c_str());
+            auto txtr = CCTextureCache::get()->textureForKey(fmt::format("logo-{}", tp->name).c_str());
             this->retain();
 
             if (!txtr) {
                 web::AsyncWebRequest()
-                    .fetch(icon)
+                    .fetch(tp->icon)
                     .bytes()
-                    .then([this, texturePackIconSpr, scale](geode::ByteVector const& data) {
+                    .then([this, texturePackIconSpr, scale, tp](geode::ByteVector const& data) {
                         imgData = data;
                         auto image = Ref(new CCImage());
                         image->initWithImageData(const_cast<uint8_t*>(data.data()),data.size());
-                        std::string theKey = fmt::format("logo-{}", name);
+                        std::string theKey = fmt::format("logo-{}", tp->name);
                         auto texture = CCTextureCache::get()->addUIImage(image,theKey.c_str());
                         image->release();
                         this->autorelease();
@@ -120,7 +111,7 @@ class TexturePackCell : public CCLayerColor {
             } else {
                 auto image = Ref(new CCImage());
                 image->initWithImageData(const_cast<uint8_t*>(imgData.data()),imgData.size());
-                std::string theKey = fmt::format("logo-{}", name);
+                std::string theKey = fmt::format("logo-{}", tp->name);
                 auto texture = CCTextureCache::get()->addUIImage(image,theKey.c_str());
                 image->release();
                 this->autorelease();
@@ -132,7 +123,7 @@ class TexturePackCell : public CCLayerColor {
             
 
             auto texturePackName = CCLabelBMFont::create(
-                tpName.c_str(),
+                tp->name.c_str(),
                 "bigFont.fnt"
             );
             this->addChild(texturePackName);
@@ -140,18 +131,33 @@ class TexturePackCell : public CCLayerColor {
             texturePackName->setScale(0.375);
             texturePackName->setAnchorPoint(ccp(0, 0.5));
 
-            std::string fullTPCreator = fmt::format("By {}", tpCreator);
+            std::string fullTPCreator = fmt::format("By {}", tp->creator);
 
             auto texturePackCreator = CCLabelBMFont::create(
                 fullTPCreator.c_str(),
                 "goldFont.fnt"
             );
-            this->addChild(texturePackCreator);
-            texturePackCreator->setPosition(50, 8);
             texturePackCreator->setScale(0.375);
-            texturePackCreator->setAnchorPoint(ccp(0, 0.5));
 
-            std::string fullTexturePackVersion = fmt::format("v{}", tpDownloadVersion);
+            auto creatorMenu = CCMenu::create();
+            creatorMenu->setPosition(50, 8);
+            creatorMenu->setAnchorPoint(ccp(0, 0.5));
+
+            auto creatorButton = CCMenuItemSpriteExtra::create(
+                texturePackCreator,
+                this,
+                menu_selector(TexturePackCell::onCreator)
+            );
+            creatorMenu->addChild(creatorButton);
+            creatorMenu->setLayout(
+                RowLayout::create()
+                    ->setAxisAlignment(AxisAlignment::Start)
+            );
+
+            this->addChild(creatorMenu);
+
+
+            std::string fullTexturePackVersion = fmt::format("v{}", tp->version);
 
             auto texturePackVersion = CCLabelBMFont::create(
                 fullTexturePackVersion.c_str(),
@@ -192,7 +198,7 @@ class TexturePackCell : public CCLayerColor {
 
             if (!ghc::filesystem::exists(filePath)) {
                 viewBtnMenu->addChild(downloadButton);
-            } else if (ghc::filesystem::exists(filePath) && Mod::get()->getSavedValue<std::string>(versionSaveThing) != version) {
+            } else if (ghc::filesystem::exists(filePath) && Mod::get()->getSavedValue<std::string>(versionSaveThing) != tp->version) {
                 viewBtnMenu->addChild(downloadButton);
             } else {
                 viewBtnMenu->addChild(deleteButton);
@@ -214,18 +220,18 @@ class TexturePackCell : public CCLayerColor {
         }
 
         void onView(CCObject*) {
-            auto info = TexturePackInfo::create(name, creator, url, icon, version, description, imgData, featured);
+            auto info = TexturePackInfo::create(texturePack);
             info->show();
         }
 
         void onDownload(CCObject*) {
-            std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), name);
-            std::string versionSaveThing = fmt::format("{} Version", name);
+            std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
+            std::string versionSaveThing = fmt::format("{} Version", texturePack->name);
             web::AsyncWebRequest()
-                .fetch(url)
+                .fetch(texturePack->download)
                 .into(fileName)
                 .then([this, fileName, versionSaveThing](auto file) {
-                    Mod::get()->setSavedValue<std::string>(versionSaveThing, version);
+                    Mod::get()->setSavedValue<std::string>(versionSaveThing, texturePack->version);
                     Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
                     auto workshopLayer = TextureWorkshopLayer::scene();
 		            CCDirector::sharedDirector()->pushScene(workshopLayer);
@@ -237,16 +243,21 @@ class TexturePackCell : public CCLayerColor {
                 });
         }
 
+        void onCreator(CCObject*) {
+            TextureWorkshopLayer::get->inp->setString(fmt::format("by:{}", texturePack->creator));
+            TextureWorkshopLayer::get->searchTPs();
+        }
+
         void onDelete(CCObject*) {
             geode::createQuickPopup(
                 "Delete Pack",
-                fmt::format("Are you sure you want to delete {}?", name),
+                fmt::format("Are you sure you want to delete {}?", texturePack->name),
                 "Nope", "Yeah",
                 [this](auto, bool btn2) {
                     if (btn2) {
-                        std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), name);
+                        std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
                         ghc::filesystem::remove(fileName);
-                        Notification::create(fmt::format("Deleted {}!", name), CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
+                        Notification::create(fmt::format("Deleted {}!", texturePack->name), CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
                         auto workshopLayer = TextureWorkshopLayer::scene();
 		                CCDirector::sharedDirector()->pushScene(workshopLayer);
                     }
@@ -254,9 +265,9 @@ class TexturePackCell : public CCLayerColor {
             );
         }
 
-        static TexturePackCell* create(std::string tpName, std::string tpCreator, std::string tpDownloadURL, std::string tpDownloadVersion, std::string tpIcon, std::string tpDesc, bool featured, bool thing) {
+        static TexturePackCell* create(TexturePack* tp, bool thing) {
             TexturePackCell* pRet = new TexturePackCell();
-            if (pRet && pRet->init(tpName, tpCreator, tpDownloadURL, tpDownloadVersion, tpIcon, tpDesc, featured, thing)) {
+            if (pRet && pRet->init(tp, thing)) {
                 pRet->autorelease();
                 return pRet;
             } else {
