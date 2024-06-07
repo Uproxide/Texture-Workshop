@@ -23,7 +23,7 @@ public:
 
         texturePack = tp;
 
-        ghc::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), tp->name);
+        std::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), tp->name);
 
         auto winSize = CCDirector::get()->getWinSize();
         float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
@@ -128,7 +128,7 @@ public:
         viewBtnMenu->setLayout(RowLayout::create());
         viewBtnMenu->setContentSize(downloadButtonSpr->getContentSize());
 
-        if (!ghc::filesystem::exists(filePath)) {
+        if (!std::filesystem::exists(filePath)) {
             viewBtnMenu->addChild(downloadButton);
             downloadButton->setPosition(downloadButtonSpr->getContentSize() / 2);
         } else {
@@ -156,7 +156,7 @@ public:
             .expect([this](std::string const& err) {
                 Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
                 std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
-                ghc::filesystem::remove(fileName);
+                std::filesystem::remove(fileName);
             });
     }
 
@@ -168,7 +168,7 @@ public:
                 [this](auto, bool btn2) {
                     if (btn2) {
                         std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
-                        ghc::filesystem::remove(fileName);
+                        std::filesystem::remove(fileName);
                         Notification::create(fmt::format("Deleted {}!", texturePack->name), CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
                         auto workshopLayer = TextureWorkshopLayer::scene();
                         this->onClose(nullptr);

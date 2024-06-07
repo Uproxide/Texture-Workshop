@@ -44,7 +44,7 @@ class TexturePackCell : public CCLayerColor {
             this->setPositionY(207);
             float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
 
-            ghc::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), tp->name);
+            std::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), tp->name);
 
             gradient = CCLayerGradient::create(ccc4(0, 0, 0, 100), ccc4(0, 255, 0, 100));
             gradient->setContentSize(this->getContentSize());
@@ -53,7 +53,7 @@ class TexturePackCell : public CCLayerColor {
 
             std::string versionSaveThing = fmt::format("{} Version", tp->name);
 
-            if (ghc::filesystem::exists(filePath)) {
+            if (std::filesystem::exists(filePath)) {
                 if (Mod::get()->getSavedValue<std::string>(versionSaveThing) == tp->version) {
                     gradient = CCLayerGradient::create(ccc4(0, 0, 0, 100), ccc4(0, 255, 0, 100));
                     gradient->setContentSize(this->getContentSize());
@@ -196,9 +196,9 @@ class TexturePackCell : public CCLayerColor {
                 menu_selector(TexturePackCell::onDelete)
             );
 
-            if (!ghc::filesystem::exists(filePath)) {
+            if (!std::filesystem::exists(filePath)) {
                 viewBtnMenu->addChild(downloadButton);
-            } else if (ghc::filesystem::exists(filePath) && Mod::get()->getSavedValue<std::string>(versionSaveThing) != tp->version) {
+            } else if (std::filesystem::exists(filePath) && Mod::get()->getSavedValue<std::string>(versionSaveThing) != tp->version) {
                 viewBtnMenu->addChild(downloadButton);
             } else {
                 viewBtnMenu->addChild(deleteButton);
@@ -239,7 +239,7 @@ class TexturePackCell : public CCLayerColor {
                 })
                 .expect([this, fileName](std::string const& err) {
                     Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
-                    ghc::filesystem::remove(fileName);
+                    std::filesystem::remove(fileName);
                 });
         }
 
@@ -256,7 +256,7 @@ class TexturePackCell : public CCLayerColor {
                 [this](auto, bool btn2) {
                     if (btn2) {
                         std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
-                        ghc::filesystem::remove(fileName);
+                        std::filesystem::remove(fileName);
                         Notification::create(fmt::format("Deleted {}!", texturePack->name), CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
                         auto workshopLayer = TextureWorkshopLayer::scene();
 		                CCDirector::sharedDirector()->pushScene(workshopLayer);
