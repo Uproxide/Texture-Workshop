@@ -1,3 +1,6 @@
+# 1.1.0
+- Fix 2.206
+  
 # 1.0.0
 - New Version Popup
 - Update Indicator for Texture Packs
