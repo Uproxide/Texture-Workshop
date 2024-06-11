@@ -2,6 +2,8 @@
 
 using namespace geode::prelude;
 #include <Geode/ui/TextInput.hpp>
+#include <Geode/utils/web.hpp>
+#include <Geode/loader/Event.hpp>
 #include "TexturePack.hpp"
 
 class TextureWorkshopLayer : public cocos2d::CCLayer, TextInputDelegate {
@@ -19,6 +21,8 @@ protected:
     CCMenuItemSpriteExtra* searchBtn;
     CCMenu* buttonMenu;
     std::string inputText;
+    EventListener<web::WebTask> m_listener;
+
 
     virtual void textChanged(CCTextInputNode* p0);
     

@@ -10,6 +10,7 @@ using namespace geode::prelude;
 #include <algorithm>
 #include <matjson.hpp>
 #include <Geode/ui/GeodeUI.hpp>
+#include <Geode/loader/Event.hpp>
 #include "JsonManager.hpp"
 
 TextureWorkshopLayer* TextureWorkshopLayer::create() {
@@ -129,7 +130,7 @@ bool TextureWorkshopLayer::init() {
     buttonMenu->addChild(filesBtn);
     filesBtn->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 25));
 
-    inp = TextInput::create(300, "Search", "chatFont.fnt");
+    inp = TextInput::create(300, "Search", "bigFont.fnt");
     inp->setContentHeight(20);
     inp->setAnchorPoint(ccp(0, 0));
     inp->ignoreAnchorPointForPosition(false); 
@@ -141,6 +142,7 @@ bool TextureWorkshopLayer::init() {
     inputNode->setPositionY(inputNode->getPositionY() - 5);
     inputNode->setPositionX(5);
     inputNode->m_placeholderLabel->setAnchorPoint(ccp(0, 0.5));
+    inputNode->m_placeholderLabel->setScale(0.8);
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
     
@@ -230,16 +232,20 @@ void TextureWorkshopLayer::onPacksFolder(CCObject*) {
 void TextureWorkshopLayer::getTexturePacks() {
 
     if (!JsonManager::downloaded) {
-        web::AsyncWebRequest()
-            .fetch("https://uproxide.xyz/api/v1/tws/getTPs.php")
-            .text()
-            .then([this](std::string const& json) {
-                parseJson(json);
+        m_listener.bind([this] (web::WebTask::Event* e) {
+            if (web::WebResponse* res = e->getValue()) {
+                JsonManager::tpJson = res->json().value();
                 JsonManager::downloaded = true;
-            })
-            .expect([this](std::string const& json) {
-                log::error("something went wrong {} :3", json);
-            });
+                onGetTPsFinished();
+            } else if (e->isCancelled()) {
+                log::info("The request was cancelled... So sad :(");
+            }
+        });
+
+        auto req = web::WebRequest();
+        
+        m_listener.setFilter(req.get("https://uproxide.xyz/api/v1/tws/getTPs.php"));
+
     } else {
         onGetTPsFinished();
     }

@@ -3,6 +3,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/Loader.hpp>
 #include <Geode/utils/web.hpp>
+#include <Geode/loader/Event.hpp>
 #include <Geode/ui/TextInput.hpp>
 #include <cctype>
 #include <algorithm>
@@ -15,6 +16,8 @@ class TexturePackInfo : public Popup<TexturePack*> {
 public:
 
     TexturePack* texturePack;
+
+    EventListener<web::WebTask> m_downloadTP;
 
     bool setup(TexturePack* tp) {
         log::info("hai");
@@ -143,21 +146,27 @@ public:
 
     void onDownload(CCObject*) {
         std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getLoadedMod("geode.texture-loader")->getConfigDir(), texturePack->name);
-        web::AsyncWebRequest()
-            .fetch(texturePack->download)
-            .into(fileName)
-            .then([this](auto file) {
-                Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
-                log::info("{}", file);
-                this->onClose(nullptr);
-                auto workshopLayer = TextureWorkshopLayer::scene();
-		        CCDirector::sharedDirector()->pushScene(workshopLayer);
-            })
-            .expect([this](std::string const& err) {
-                Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
-                std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
-                std::filesystem::remove(fileName);
+        m_downloadTP.bind([this] (web::WebTask::Event* e) {
+                if (web::WebResponse* res = e->getValue()) {
+                    if (res->into(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name))) {
+                        std::string versionSaveThing = fmt::format("{} Version", texturePack->name);
+                        Mod::get()->setSavedValue<std::string>(versionSaveThing, texturePack->version);
+                        Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
+                        auto workshopLayer = TextureWorkshopLayer::scene();
+		                CCDirector::sharedDirector()->pushScene(workshopLayer);
+                    } else {
+                        Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
+                        std::filesystem::remove(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name));
+                    }
+                    
+                } else if (e->isCancelled()) {
+                    log::info("The request was cancelled... So sad :(");
+                }
             });
+
+            auto req = web::WebRequest();
+            
+            m_downloadTP.setFilter(req.get(texturePack->download));
     }
 
     void onDelete(CCObject*) {

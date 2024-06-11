@@ -2,6 +2,7 @@
 
 #include <Geode/Geode.hpp>
 #include <Geode/utils/web.hpp>
+#include <Geode/loader/Event.hpp>
 #include <Geode/ui/TextInput.hpp>
 #include <cctype>
 #include <algorithm>
@@ -22,6 +23,9 @@ class TexturePackCell : public CCLayerColor {
         CCLayerGradient* gradient;
 
         TexturePack* texturePack;
+
+        EventListener<web::WebTask> m_downloadTP;
+        EventListener<web::WebTask> m_getIcon;
 
 
         bool init(TexturePack* tp, bool thing) {
@@ -91,23 +95,31 @@ class TexturePackCell : public CCLayerColor {
             this->retain();
 
             if (!txtr) {
-                web::AsyncWebRequest()
-                    .fetch(tp->icon)
-                    .bytes()
-                    .then([this, texturePackIconSpr, scale, tp](geode::ByteVector const& data) {
-                        imgData = data;
+                m_getIcon.bind([this, texturePackIconSpr, scale, tp] (web::WebTask::Event* e) {
+                if (web::WebResponse* res = e->getValue()) {
+                    if (res->ok()) {
+                        imgData = res->data();
                         auto image = Ref(new CCImage());
-                        image->initWithImageData(const_cast<uint8_t*>(data.data()),data.size());
+                        image->initWithImageData(const_cast<uint8_t*>(res->data().data()),res->data().size());
                         std::string theKey = fmt::format("logo-{}", tp->name);
                         auto texture = CCTextureCache::get()->addUIImage(image,theKey.c_str());
                         image->release();
                         this->autorelease();
                         texturePackIconSpr->initWithTexture(texture);
                         texturePackIconSpr->setScale(0.35 * scale);
-                    })
-                    .expect([this](std::string const& error) {
-                        
-                    });
+                    } else {
+                        // icon has NO icon hwta
+                    }
+                    
+                    
+                } else if (e->isCancelled()) {
+                    log::info("The request was cancelled... So sad :(");
+                }
+                });
+
+                auto req = web::WebRequest();
+                
+                m_getIcon.setFilter(req.get(tp->icon));
             } else {
                 auto image = Ref(new CCImage());
                 image->initWithImageData(const_cast<uint8_t*>(imgData.data()),imgData.size());
@@ -225,22 +237,27 @@ class TexturePackCell : public CCLayerColor {
         }
 
         void onDownload(CCObject*) {
-            std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
-            std::string versionSaveThing = fmt::format("{} Version", texturePack->name);
-            web::AsyncWebRequest()
-                .fetch(texturePack->download)
-                .into(fileName)
-                .then([this, fileName, versionSaveThing](auto file) {
-                    Mod::get()->setSavedValue<std::string>(versionSaveThing, texturePack->version);
-                    Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
-                    auto workshopLayer = TextureWorkshopLayer::scene();
-		            CCDirector::sharedDirector()->pushScene(workshopLayer);
-                    log::info("{}", file);
-                })
-                .expect([this, fileName](std::string const& err) {
-                    Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
-                    std::filesystem::remove(fileName);
-                });
+            m_downloadTP.bind([this] (web::WebTask::Event* e) {
+                if (web::WebResponse* res = e->getValue()) {
+                    if (res->into(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name))) {
+                        std::string versionSaveThing = fmt::format("{} Version", texturePack->name);
+                        Mod::get()->setSavedValue<std::string>(versionSaveThing, texturePack->version);
+                        Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
+                        auto workshopLayer = TextureWorkshopLayer::scene();
+		                CCDirector::sharedDirector()->pushScene(workshopLayer);
+                    } else {
+                        Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
+                        std::filesystem::remove(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name));
+                    }
+                    
+                } else if (e->isCancelled()) {
+                    log::info("The request was cancelled... So sad :(");
+                }
+            });
+
+            auto req = web::WebRequest();
+            
+            m_downloadTP.setFilter(req.get(texturePack->download));
         }
 
         void onCreator(CCObject*) {
