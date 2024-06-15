@@ -142,7 +142,7 @@ bool TextureWorkshopLayer::init() {
     inputNode->setPositionY(inputNode->getPositionY() - 5);
     inputNode->setPositionX(5);
     inputNode->m_placeholderLabel->setAnchorPoint(ccp(0, 0.5));
-    inputNode->m_placeholderLabel->setScale(0.8);
+    inputNode->m_placeholderLabel->setScale(0.5);
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
     
@@ -357,7 +357,9 @@ void TextureWorkshopLayer::onGetTPsFinished() {
         tpAmount->setPositionY(director->getScreenBottom() + 13);
         tpAmount->setZOrder(5);
         refreshButton->setVisible(true);
+        
     }
+
 }
 
 void TextureWorkshopLayer::textChanged(CCTextInputNode* p0){

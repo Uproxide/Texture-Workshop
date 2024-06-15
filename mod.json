@@ -1,11 +1,11 @@
 {
-	"geode": "3.0.0-alpha.2",
+	"geode": "3.0.0-beta.1",
 	"gd": {
 		"win": "2.206",
 		"android": "2.206",
 		"mac": "2.206"
 	},
-	"version": "v1.1.0",
+	"version": "v1.2.0",
 	"id": "uproxide.textures",
 	"name": "Texture Workshop",
 	"developer": "Uproxide",
@@ -23,7 +23,7 @@
 	"dependencies": [
 		{
 			"id": "geode.texture-loader",
-            "version": ">=1.6.0-beta.1",
+            "version": ">=1.6.0",
             "importance": "required"
 		}
 	],
