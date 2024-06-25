@@ -1,3 +1,7 @@
+# 1.3.2
+- Fix crash on pretty much doing anything that calls onGetTPsFinished
+- Allow icons to be a different res than 336x336
+
 # 1.3.1
 - Fix Crash when spamming Version Filter button
 - Fix Filter Button alignment

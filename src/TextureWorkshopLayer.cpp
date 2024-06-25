@@ -239,6 +239,7 @@ void TextureWorkshopLayer::onRefresh(CCObject*) {
     tpAmount->removeFromParent();
     refreshButton->setVisible(false);
     scroll = nullptr;
+    tpAmount = nullptr;
     getTexturePacks();
 }
 
@@ -248,6 +249,7 @@ void TextureWorkshopLayer::onRefreshSearch(CCObject*) {
     tpAmount->removeFromParent();
     refreshButton->setVisible(false);
     scroll = nullptr;
+    tpAmount = nullptr;
     getTexturePacks();
 }
 

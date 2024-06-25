@@ -46,7 +46,6 @@ class TexturePackCell : public CCLayerColor {
             this->setContentSize(ccp(315, 35));
             this->setAnchorPoint(ccp(0, 1));
             this->setPositionY(207);
-            float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
 
             std::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), tp->name);
 
@@ -83,19 +82,27 @@ class TexturePackCell : public CCLayerColor {
                 featuredSpr->setPosition(this->getContentSize() / 2);
                 featuredSpr->setPositionX(30);
             }
+
+            auto iconMenu = CCMenu::create();
             
             auto texturePackIconSpr = CCSprite::createWithSpriteFrameName("TWS_PlaceholderLogo.png"_spr);
-            this->addChild(texturePackIconSpr);
-            texturePackIconSpr->setScale(0.35);
-            texturePackIconSpr->setPosition(this->getContentSize() / 2);
-            texturePackIconSpr->setPositionX(30);
-            
+            iconMenu->addChild(texturePackIconSpr);
+            this->addChild(iconMenu);
+            iconMenu->setScale(0.35);
+            iconMenu->setPosition(this->getContentSize() / 2);
+            iconMenu->setPositionX(30);
+            iconMenu->setContentWidth(84);
+            iconMenu->setContentHeight(84);
+            iconMenu->setLayout(
+                RowLayout::create()
+                    ->setAutoScale(true)
+            );
 
             auto txtr = CCTextureCache::get()->textureForKey(fmt::format("logo-{}", tp->name).c_str());
             this->retain();
 
             if (!txtr) {
-                m_getIcon.bind([this, texturePackIconSpr, scale, tp] (web::WebTask::Event* e) {
+                m_getIcon.bind([this, texturePackIconSpr, iconMenu, tp] (web::WebTask::Event* e) {
                 if (web::WebResponse* res = e->getValue()) {
                     if (res->ok()) {
                         imgData = res->data();
@@ -106,7 +113,7 @@ class TexturePackCell : public CCLayerColor {
                         image->release();
                         this->autorelease();
                         texturePackIconSpr->initWithTexture(texture);
-                        texturePackIconSpr->setScale(0.35 * scale);
+                        iconMenu->updateLayout();
                     } else {
                         // icon has NO icon hwta
                     }
@@ -128,11 +135,8 @@ class TexturePackCell : public CCLayerColor {
                 image->release();
                 this->autorelease();
                 texturePackIconSpr->initWithTexture(texture);
-                texturePackIconSpr->setScale(0.35 * scale);
+                iconMenu->updateLayout();
             }
-            
-
-            
 
             auto texturePackName = CCLabelBMFont::create(
                 tp->name.c_str(),
