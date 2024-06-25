@@ -15,9 +15,14 @@ using namespace geode::prelude;
 
 class TWSFilters : public Popup<> {
 public:
+    CCMenuItemToggler* versionFilter;
+    static inline TWSFilters* get = nullptr;
+
     bool setup() {
         log::info("hai");
         auto winSize = CCDirector::get()->getWinSize();
+
+        get = this;
         
         this->setTitle("Filters");
         m_title->setScale(0.85);
@@ -35,7 +40,7 @@ public:
         bg->addChild(menu);
         menu->setPosition(0, 0);
 
-        auto versionFilter = CCMenuItemToggler::createWithStandardSprites(
+        versionFilter = CCMenuItemToggler::createWithStandardSprites(
             this,
             menu_selector(TWSFilters::onToggle),
             1
@@ -63,7 +68,7 @@ public:
             case 1:
                 boobs::versionFilter = !boobs::versionFilter;
                 Mod::get()->setSavedValue<bool>("version-filter", boobs::versionFilter);
-                TextureWorkshopLayer::get->onRefresh(nullptr);
+                TextureWorkshopLayer::get->onGetTPsFinished();
                 break;
             default:
                 break;

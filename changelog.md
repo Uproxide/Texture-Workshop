@@ -1,3 +1,11 @@
+# 1.3.1
+- Fix Crash when spamming Version Filter button
+- Fix Filter Button alignment
+- Make Happy Textures recommended (as THIS MODS DEPENDENCY, TP Creators this is entirely optional)
+- Updated mod.json tags
+- More links
+- Support.md
+
 # 1.3.0
 - Version Filtering
 - Version (And GD Version) in Info Popup

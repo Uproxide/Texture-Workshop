@@ -148,16 +148,26 @@ bool TextureWorkshopLayer::init() {
     inputNode->m_placeholderLabel->setScale(0.5);
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
+
+    auto inpMenu = CCMenu::create();
+    inpMenu->setContentSize(inp->getContentSize());
+    inp->addChild(inpMenu);
+    
     
     auto filterSpr = CCSprite::createWithSpriteFrameName("TWS_SearchButton.png"_spr);
+    filterSpr->setScale(0.9);
     auto filterBtn = CCMenuItemSpriteExtra::create(
         filterSpr,
         this,
         menu_selector(TextureWorkshopLayer::onFilter)
     );
-    buttonMenu->addChild(filterBtn);
-    filterBtn->setPositionX(inp->getContentWidth() + 150);
-    filterBtn->setPositionY(director->getScreenTop() - 68);
+    inpMenu->addChild(filterBtn);
+    inpMenu->setLayout(
+        RowLayout::create()
+            ->setAxisAlignment(AxisAlignment::End)
+    );
+    inpMenu->setPosition(inp->getContentSize() / 2);
+    filterBtn->setPositionX(filterBtn->getPositionX() + 5);
 
     getTexturePacks();
 
@@ -218,7 +228,7 @@ void TextureWorkshopLayer::onSupport(CCObject*) {
 void TextureWorkshopLayer::onCredits(CCObject*) {
     FLAlertLayer::create(
         "Credits",
-        "<cg>Uproxide</c> - Main Developer\n<cr>TheSillyDoggo</c> - Help with Searching\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support\n\nSupporters:\nno one...",
+        "<cg>Uproxide</c> - Main Developer\n<cr>TheSillyDoggo</c> - Help with Searching\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
         "Ok"
     )->show();
 }
@@ -283,6 +293,10 @@ void TextureWorkshopLayer::parseJson(std::string str) {
 }
 
 void TextureWorkshopLayer::onGetTPsFinished() {
+    if (scroll || tpAmount) {
+        scroll->removeFromParent();
+        tpAmount->removeFromParent();
+    }
     tps.clear();
     auto director = CCDirector::sharedDirector();
     auto winSize = director->getWinSize();
@@ -328,7 +342,6 @@ void TextureWorkshopLayer::onGetTPsFinished() {
 
             tpCount += 1;
 
-            log::info("{}", Loader::get()->getGameVersion());
             if (boobs::versionFilter) {
                 if (tpObject["gdVersion"].as_string() == Loader::get()->getGameVersion() || tpObject["gdVersion"].as_string() == "Any") {
                     TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
@@ -407,21 +420,23 @@ void TextureWorkshopLayer::searchTPs() {
         auto name = inp->getString();
 
         if (inp->getString().starts_with("by:")) {
-            if(utils::string::toLower(tps[i]->creator).find(utils::string::toLower(name.substr(name.find(":") + 1, name.size() - name.find(":")))) != std::string::npos)
-            {
-                auto cell = TexturePackCell::create(tps[i], thing);
+                if(utils::string::toLower(tps[i]->creator).find(utils::string::toLower(name.substr(name.find(":") + 1, name.size() - name.find(":")))) != std::string::npos)
+                {
+                    auto cell = TexturePackCell::create(tps[i], thing);
 
-                content->addChild(cell);
-            }
-        } else {
-            if (utils::string::toLower(tps[i]->name).find(utils::string::toLower(inp->getString())) != std::string::npos)
-            {
-                auto cell = TexturePackCell::create(tps[i], thing);
+                    content->addChild(cell);
+                }
+            } else {
+                if (utils::string::toLower(tps[i]->name).find(utils::string::toLower(inp->getString())) != std::string::npos)
+                {
+                    auto cell = TexturePackCell::create(tps[i], thing);
 
-                content->addChild(cell);
+                    content->addChild(cell);
+                }
             }
         }
-    }
+    
+    
 
     float height = std::max<float>(scroll->getContentSize().height, 35 * content->getChildrenCount());
 
