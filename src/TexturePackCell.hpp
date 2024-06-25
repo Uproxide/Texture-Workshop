@@ -243,8 +243,7 @@ class TexturePackCell : public CCLayerColor {
                         std::string versionSaveThing = fmt::format("{} Version", texturePack->name);
                         Mod::get()->setSavedValue<std::string>(versionSaveThing, texturePack->version);
                         Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
-                        auto workshopLayer = TextureWorkshopLayer::scene();
-		                CCDirector::sharedDirector()->pushScene(workshopLayer);
+                        TextureWorkshopLayer::get->onRefresh(nullptr);
                     } else {
                         Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
                         std::filesystem::remove(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name));
@@ -275,8 +274,7 @@ class TexturePackCell : public CCLayerColor {
                         std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
                         std::filesystem::remove(fileName);
                         Notification::create(fmt::format("Deleted {}!", texturePack->name), CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
-                        auto workshopLayer = TextureWorkshopLayer::scene();
-		                CCDirector::sharedDirector()->pushScene(workshopLayer);
+                        TextureWorkshopLayer::get->onRefresh(nullptr);
                     }
                 }
             );

@@ -11,7 +11,8 @@ using namespace geode::prelude;
 #include <matjson.hpp>
 #include <Geode/ui/GeodeUI.hpp>
 #include <Geode/loader/Event.hpp>
-#include "JsonManager.hpp"
+#include "boobs.hpp"
+#include "TWSFilters.hpp"
 
 TextureWorkshopLayer* TextureWorkshopLayer::create() {
     auto ret = new TextureWorkshopLayer();
@@ -130,6 +131,8 @@ bool TextureWorkshopLayer::init() {
     buttonMenu->addChild(filesBtn);
     filesBtn->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 25));
 
+    
+
     inp = TextInput::create(300, "Search", "bigFont.fnt");
     inp->setContentHeight(20);
     inp->setAnchorPoint(ccp(0, 0));
@@ -146,6 +149,15 @@ bool TextureWorkshopLayer::init() {
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
     
+    auto filterSpr = CCSprite::createWithSpriteFrameName("TWS_SearchButton.png"_spr);
+    auto filterBtn = CCMenuItemSpriteExtra::create(
+        filterSpr,
+        this,
+        menu_selector(TextureWorkshopLayer::onFilter)
+    );
+    buttonMenu->addChild(filterBtn);
+    filterBtn->setPositionX(inp->getContentWidth() + 150);
+    filterBtn->setPositionY(director->getScreenTop() - 68);
 
     getTexturePacks();
 
@@ -186,6 +198,10 @@ void TextureWorkshopLayer::onDiscord(CCObject*) {
     );
 }
 
+void TextureWorkshopLayer::onFilter(CCObject*) {
+    TWSFilters::create()->show();
+}
+
 void TextureWorkshopLayer::onSupport(CCObject*) {
     geode::createQuickPopup(
         "Support Me",
@@ -202,13 +218,13 @@ void TextureWorkshopLayer::onSupport(CCObject*) {
 void TextureWorkshopLayer::onCredits(CCObject*) {
     FLAlertLayer::create(
         "Credits",
-        "<cg>Uproxide</c> - Main Developer\n<cr>TheSillyDoggo</c> - Help with Searching\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
+        "<cg>Uproxide</c> - Main Developer\n<cr>TheSillyDoggo</c> - Help with Searching\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support\n\nSupporters:\nno one...",
         "Ok"
     )->show();
 }
 
 void TextureWorkshopLayer::onRefresh(CCObject*) {
-    JsonManager::downloaded = false;
+    boobs::downloaded = false;
     scroll->removeFromParent();
     tpAmount->removeFromParent();
     refreshButton->setVisible(false);
@@ -217,7 +233,7 @@ void TextureWorkshopLayer::onRefresh(CCObject*) {
 }
 
 void TextureWorkshopLayer::onRefreshSearch(CCObject*) {
-    JsonManager::downloaded = true;
+    boobs::downloaded = true;
     scroll->removeFromParent();
     tpAmount->removeFromParent();
     refreshButton->setVisible(false);
@@ -231,11 +247,11 @@ void TextureWorkshopLayer::onPacksFolder(CCObject*) {
 
 void TextureWorkshopLayer::getTexturePacks() {
 
-    if (!JsonManager::downloaded) {
+    if (!boobs::downloaded) {
         m_listener.bind([this] (web::WebTask::Event* e) {
             if (web::WebResponse* res = e->getValue()) {
-                JsonManager::tpJson = res->json().value();
-                JsonManager::downloaded = true;
+                boobs::tpJson = res->json().value();
+                boobs::downloaded = true;
                 onGetTPsFinished();
             } else if (e->isCancelled()) {
                 log::info("The request was cancelled... So sad :(");
@@ -257,8 +273,8 @@ void TextureWorkshopLayer::parseJson(std::string str) {
         
     } else {
         try {
-            JsonManager::tpJson = matjson::parse(str);
-            log::info("{}", JsonManager::tpJson);
+            boobs::tpJson = matjson::parse(str);
+            log::info("{}", boobs::tpJson);
         } catch (const std::exception& e) {
             log::error("Failed to parse JSON: {}", e.what());
         }
@@ -267,30 +283,23 @@ void TextureWorkshopLayer::parseJson(std::string str) {
 }
 
 void TextureWorkshopLayer::onGetTPsFinished() {
+    tps.clear();
     auto director = CCDirector::sharedDirector();
     auto winSize = director->getWinSize();
-
     bool thing = false;
-
     scroll = ScrollLayer::create(ccp(313, 180));
 	scroll->setAnchorPoint(ccp(0, 0));
     scroll->ignoreAnchorPointForPosition(false);
-
-
     int basePosY = 207;
     int tpCount = 0;
     this->outline->addChild(scroll);
-
     scroll->setZOrder(-1);
     scroll->setPositionX(0);
     scroll->setPositionY(8);
-    
-
-	
 	scroll->m_contentLayer->removeAllChildren();
 	
-	if (JsonManager::tpJson.is_object() && !search) {
-	    for (const auto& pair : JsonManager::tpJson.as_object()) {
+	if (boobs::tpJson.is_object() && !search) {
+	    for (const auto& pair : boobs::tpJson.as_object()) {
 	        const auto& tpObject = pair.second;
             std::string tpName;
             std::string tpCreator;
@@ -298,6 +307,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
             std::string tpDownloadVersion;
             std::string tpIcon;
             std::string tpDesc;
+            std::string gdVersion;
             bool featured;
 
             tpName = tpObject["packName"].as_string();
@@ -306,6 +316,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
             tpDownloadVersion = tpObject["packVersion"].as_string();
             tpIcon = tpObject["packLogo"].as_string();
             tpDesc = tpObject["packDescription"].as_string();
+            gdVersion = tpObject["gdVersion"].as_string();
 
             if (tpObject["packFeature"].as_int() == 1) {
                 featured = true;
@@ -316,35 +327,51 @@ void TextureWorkshopLayer::onGetTPsFinished() {
             thing = !thing;
 
             tpCount += 1;
-            
-            TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, featured);
 
-	        auto cell = TexturePackCell::create(tp, thing);
-            tps.push_back(tp);
-	        cell->setPositionY(basePosY);
-	        scroll->m_contentLayer->addChild(cell);
-	        scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
+            log::info("{}", Loader::get()->getGameVersion());
+            if (boobs::versionFilter) {
+                if (tpObject["gdVersion"].as_string() == Loader::get()->getGameVersion() || tpObject["gdVersion"].as_string() == "Any") {
+                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+
+                    auto cell = TexturePackCell::create(tp, thing);
+                    tps.push_back(tp);
+                    cell->setPositionY(basePosY);
+                    scroll->m_contentLayer->addChild(cell);
+                    scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
+                } else if (tpObject["gdVersion"].as_string() == "2.204" && (Loader::get()->getGameVersion() == "2.204" || Loader::get()->getGameVersion() == "2.205")) {
+                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+
+                    auto cell = TexturePackCell::create(tp, thing);
+                    tps.push_back(tp);
+                    cell->setPositionY(basePosY);
+                    scroll->m_contentLayer->addChild(cell);
+                    scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
+                }
+            } else {
+                TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+
+                auto cell = TexturePackCell::create(tp, thing);
+                tps.push_back(tp);
+                cell->setPositionY(basePosY);
+                scroll->m_contentLayer->addChild(cell);
+                scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
+            }     
 	
 	        float height = std::max<float>(scroll->getContentSize().height, 35 * scroll->m_contentLayer->getChildrenCount());
-	
 	        scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
-	
 	        CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
-
             int i = 0;
-	
 	
 			for (auto* obj : objects) {
 	            i++;
 				obj->setPositionY(height - (35 * i));
 	
 			}
-
 	
 	        scroll->moveToTop();
 	    }
 
-        std::string countThing = fmt::format("{} Texture Packs", tpCount);
+        std::string countThing = fmt::format("{} Texture Packs", tps.size());
 
         tpAmount = CCLabelBMFont::create(
             countThing.c_str(),

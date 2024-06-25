@@ -1,3 +1,9 @@
+# 1.3.0
+- Version Filtering
+- Version (And GD Version) in Info Popup
+- MacOS (if it builds)
+- Bugfixes
+
 # 1.2.0
 - idk
 

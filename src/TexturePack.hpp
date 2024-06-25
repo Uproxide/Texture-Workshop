@@ -5,10 +5,10 @@ using namespace geode::prelude;
 class TexturePack
 {
     public:
-        std::string name, creator, download, icon, version, description;
+        std::string name, creator, download, icon, version, gd, description;
         bool featured;
 
-        static TexturePack* create(std::string p0, std::string p1, std::string p2, std::string p3, std::string p4, std::string p5, bool p6) {
+        static TexturePack* create(std::string p0, std::string p1, std::string p2, std::string p3, std::string p4, std::string p5, std::string p6, bool p7) {
             auto tp = new TexturePack();
 
             tp->name = p0;
@@ -17,7 +17,8 @@ class TexturePack
             tp->icon = p3;
             tp->version = p4;
             tp->description = p5;
-            tp->featured = p6;
+            tp->gd = p6;
+            tp->featured = p7;
 
             return tp;
         }

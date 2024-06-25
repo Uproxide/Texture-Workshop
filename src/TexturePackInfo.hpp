@@ -36,7 +36,7 @@ public:
         texturePackIconSpr->setScale(0.65);
         texturePackIconSpr->setPosition(this->getContentSize() / 2);
         texturePackIconSpr->setPositionY(texturePackIconSpr->getPositionY() + 80);
-        texturePackIconSpr->setPositionX(texturePackIconSpr->getPositionX() - 100);
+        texturePackIconSpr->setPositionX(texturePackIconSpr->getPositionX() - 116);
         texturePackIconSpr->setZOrder(1);
 
         if (tp->featured) {
@@ -77,7 +77,34 @@ public:
         tpNameMenu->updateLayout();
         tpNameMenu->setPosition(texturePackIconSpr->getPosition());
         tpNameMenu->setPositionX(tpNameMenu->getPositionX() + 35);
-        tpNameMenu->setPositionY(tpNameMenu->getPositionY() + 7);
+        tpNameMenu->setPositionY(tpNameMenu->getPositionY() + 17);
+
+        auto texturePackVer = CCLabelBMFont::create(
+            tp->version.c_str(),
+            "bigFont.fnt"
+        );
+        texturePackVer->setScale(0.4);
+        texturePackVer->setColor(ccc3(0, 200, 255));
+        texturePackVer->setAnchorPoint(ccp(0, 0.5));
+        this->addChild(texturePackVer);
+        texturePackVer->setPosition(tpNameMenu->getPosition());
+        texturePackVer->setPositionY(texturePackVer->getPositionY() - 13);
+
+        std::string gdVerStr = fmt::format("Works on GD {}.", tp->gd);
+        if (tp->gd == "Any") {
+            gdVerStr = "Works on Any GD Version!";
+        }
+
+        auto gdVer = CCLabelBMFont::create(
+            gdVerStr.c_str(),
+            "bigFont.fnt"
+        );
+        gdVer->setScale(0.4);
+        gdVer->setColor(ccc3(0, 200, 255));
+        gdVer->setAnchorPoint(ccp(0, 0.5));
+        this->addChild(gdVer);
+        gdVer->setPosition(texturePackVer->getPosition());
+        gdVer->setPositionY(gdVer->getPositionY() - 11);
         
 
         std::string fullTPCreator = fmt::format("By {}", tp->creator);
@@ -93,7 +120,7 @@ public:
         texturePackCreator->setAnchorPoint(ccp(0, 0.5));
         texturePackCreator->setPosition(texturePackIconSpr->getPosition());
         texturePackCreator->setPositionX(texturePackCreator->getPositionX() + 35);
-        texturePackCreator->setPositionY(texturePackCreator->getPositionY() - 7);
+        texturePackCreator->setPositionY(texturePackCreator->getPositionY() - 18);
 
         auto line = CCSprite::createWithSpriteFrameName("floorLine_001.png");
         this->addChild(line);
@@ -140,6 +167,8 @@ public:
         }
         
         viewBtnMenu->setPosition(line->getPosition());
+        viewBtnMenu->setPositionX(viewBtnMenu->getPositionX() + 150);
+        viewBtnMenu->setPositionY(viewBtnMenu->getPositionY() + 53);
 
         return true;
     }
@@ -152,8 +181,8 @@ public:
                         std::string versionSaveThing = fmt::format("{} Version", texturePack->name);
                         Mod::get()->setSavedValue<std::string>(versionSaveThing, texturePack->version);
                         Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
-                        auto workshopLayer = TextureWorkshopLayer::scene();
-		                CCDirector::sharedDirector()->pushScene(workshopLayer);
+                        this->onClose(nullptr);
+                        TextureWorkshopLayer::get->onRefresh(nullptr);
                     } else {
                         Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
                         std::filesystem::remove(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name));
@@ -179,9 +208,8 @@ public:
                         std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name);
                         std::filesystem::remove(fileName);
                         Notification::create(fmt::format("Deleted {}!", texturePack->name), CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
-                        auto workshopLayer = TextureWorkshopLayer::scene();
                         this->onClose(nullptr);
-		                CCDirector::sharedDirector()->pushScene(workshopLayer);
+		                TextureWorkshopLayer::get->onRefresh(nullptr);
                     }
                 }
             );

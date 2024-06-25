@@ -44,4 +44,5 @@ public:
     void onRefresh(CCObject*);
     void onCredits(CCObject*);
     void onRefreshSearch(CCObject*);
+    void onFilter(CCObject*);
 };

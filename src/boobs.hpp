@@ -2,10 +2,9 @@
 
 using namespace geode::prelude;
 
-class JsonManager {
+class boobs {
     public:
         inline static bool downloaded = false;
-        inline static bool nameFilter = true;
-        inline static bool creatorFilter = false;
+        inline static bool versionFilter = true;
         inline static matjson::Value tpJson; // nothing to see here!
 };
