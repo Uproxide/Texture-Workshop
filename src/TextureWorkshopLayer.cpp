@@ -51,14 +51,29 @@ bool TextureWorkshopLayer::init() {
     setKeyboardEnabled(true);
     setKeypadEnabled(true);
 
-    m_background = CCSprite::createWithSpriteFrameName("TWS_Background.png"_spr);
+    m_background = CCLayerGradient::create({181, 69, 20, 255}, {48, 15, 104, 255}, {1, -1});
     m_background->setAnchorPoint({ 0.f, 0.f });
-    m_background->setScale(1.5);
-    addChild(m_background, -2);
+    m_background->setContentSize(CCDirector::get()->getWinSize());
+    addChild(m_background, -3);
 
-    m_background->setScaleX((winSize.width + 10.f) / m_background->getTextureRect().size.width);
-    m_background->setScaleY((winSize.height + 10.f) / m_background->getTextureRect().size.height);
-    m_background->setPosition(ccp(-5, -5));
+    auto spriteTexture = CCSprite::createWithSpriteFrameName("TWS_Cubes.png"_spr);
+    m_backgroundCubesContainer = CCSpriteBatchNode::createWithTexture(spriteTexture->getTexture());
+    for(int y = 0; y < std::ceil(CCDirector::get()->getWinSize().height / spriteTexture->getContentHeight()) + 2; y++) {
+        for(int x = 0; x < std::ceil(CCDirector::get()->getWinSize().width / spriteTexture->getContentWidth()) + 2; x++) {
+            auto sprite = CCSprite::createWithSpriteFrameName("TWS_Cubes.png"_spr);
+            sprite->setAnchorPoint({0, 1});
+            sprite->setPositionY(CCDirector::get()->getWinSize().height - sprite->getContentHeight() * (y - 1));
+            sprite->setPositionX(sprite->getContentWidth() * (x - 1));
+            m_backgroundCubesContainer->addChild(sprite);
+        }
+    }
+    m_backgroundCubesContainer->setRotation(18);
+    m_backgroundCubesContainer->runAction(CCRepeatForever::create(CCSequence::create(
+        CCMoveBy::create(5, {16, 49}),
+        CCMoveBy::create(0, {-16, -49}),
+        nullptr
+    )));
+    addChild(m_backgroundCubesContainer, -2);
 
     auto bg = cocos2d::extension::CCScale9Sprite::create("square02_small.png");
 
