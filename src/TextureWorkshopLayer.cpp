@@ -35,6 +35,8 @@ bool TextureWorkshopLayer::init() {
     if(!CCLayer::init())
         return false;
 
+    setID("TextureWorkshopLayer");
+
     auto director = CCDirector::sharedDirector();
     auto winSize = director->getWinSize();
 
@@ -42,8 +44,10 @@ bool TextureWorkshopLayer::init() {
 
     CCSprite* backSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
     CCMenuItemSpriteExtra* backBtn = CCMenuItemSpriteExtra::create(backSpr, this, menu_selector(TextureWorkshopLayer::onClose));
+    backBtn->setID("back-button");
 
     CCMenu* backMenu = CCMenu::create();
+    backMenu->setID("back-menu");
     backMenu->addChild(backBtn);
     addChild(backMenu, 1);
 
@@ -52,31 +56,36 @@ bool TextureWorkshopLayer::init() {
     setKeypadEnabled(true);
 
     m_background = CCLayerGradient::create({181, 69, 20, 255}, {48, 15, 104, 255}, {1, -1});
+    m_background->setID("background");
     m_background->setAnchorPoint({ 0.f, 0.f });
     m_background->setContentSize(CCDirector::get()->getWinSize());
     addChild(m_background, -3);
 
-    auto spriteTexture = CCSprite::createWithSpriteFrameName("TWS_Cubes.png"_spr);
-    m_backgroundCubesContainer = CCSpriteBatchNode::createWithTexture(spriteTexture->getTexture());
-    for(int y = 0; y < std::ceil(CCDirector::get()->getWinSize().height / spriteTexture->getContentHeight()) + 2; y++) {
-        for(int x = 0; x < std::ceil(CCDirector::get()->getWinSize().width / spriteTexture->getContentWidth()) + 2; x++) {
-            auto sprite = CCSprite::createWithSpriteFrameName("TWS_Cubes.png"_spr);
-            sprite->setAnchorPoint({0, 1});
-            sprite->setPositionY(CCDirector::get()->getWinSize().height - sprite->getContentHeight() * (y - 1));
-            sprite->setPositionX(sprite->getContentWidth() * (x - 1));
-            m_backgroundCubesContainer->addChild(sprite);
-        }
-    }
-    m_backgroundCubesContainer->setRotation(18);
-    m_backgroundCubesContainer->runAction(CCRepeatForever::create(CCSequence::create(
+    auto spriteTexture = CCSprite::create("TWS_Cubes.png"_spr);
+    spriteTexture->setAnchorPoint({0, 0});
+
+    ccTexParams params = {GL_LINEAR, GL_LINEAR, GL_REPEAT, GL_REPEAT};
+    spriteTexture->getTexture()->setTexParameters(&params);
+
+    auto rect = spriteTexture->getTextureRect();
+    rect.size = rect.size * (CCPoint(winSize) / CCPoint(spriteTexture->getScaledContentSize()) * 2);
+    rect.origin = CCPoint{0, 0};
+    spriteTexture->setTextureRect(rect);
+    spriteTexture->setRotation(18);
+    spriteTexture->setOpacity(100);
+    spriteTexture->setPosition({-winSize.width/2, 0});
+    spriteTexture->setID("background-overlay");
+    spriteTexture->setBlendFunc({ GL_SRC_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA });
+    spriteTexture->runAction(CCRepeatForever::create(CCSequence::create(
         CCMoveBy::create(5, {16, 49}),
         CCMoveBy::create(0, {-16, -49}),
         nullptr
     )));
-    addChild(m_backgroundCubesContainer, -2);
+
+    addChild(spriteTexture, -2);
 
     auto bg = cocos2d::extension::CCScale9Sprite::create("square02_small.png");
-
+    bg->setID("content-background");
     this->addChild(bg);
 
     bg->setPosition(winSize / 2);
@@ -86,12 +95,14 @@ bool TextureWorkshopLayer::init() {
     bg->setPositionY(bg->getPositionY() - 15);
 
     outline = CCSprite::createWithSpriteFrameName("TWS_Outline.png"_spr);
+    outline->setID("outline");
     this->addChild(outline);
     outline->setPosition(winSize / 2);
     outline->setScale(1.2);
     outline->setZOrder(1);
 
     buttonMenu = CCMenu::create();
+    buttonMenu->setID("button-menu");
     addChild(buttonMenu, 1);
     
     buttonMenu->setPosition(0, 0);
@@ -103,6 +114,7 @@ bool TextureWorkshopLayer::init() {
         this,
         menu_selector(TextureWorkshopLayer::onDiscord)
     );
+    discordButton->setID("discord-button");
     buttonMenu->addChild(discordButton);
     discordButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 20));
 
@@ -112,6 +124,7 @@ bool TextureWorkshopLayer::init() {
         this,
         menu_selector(TextureWorkshopLayer::onSupport)
     );
+    supportButton->setID("support-button");
     buttonMenu->addChild(supportButton);
     supportButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 55));
 
@@ -122,6 +135,7 @@ bool TextureWorkshopLayer::init() {
         this,
         menu_selector(TextureWorkshopLayer::onCredits)
     );
+    creditsButton->setID("credits-button");
     buttonMenu->addChild(creditsButton);
     creditsButton->setPosition(ccp(director->getScreenRight() - 20, director->getScreenBottom() + 90));
 
@@ -132,6 +146,7 @@ bool TextureWorkshopLayer::init() {
         this,
         menu_selector(TextureWorkshopLayer::onRefresh)
     );
+    refreshButton->setID("refresh-button");
     buttonMenu->addChild(refreshButton);
     refreshButton->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 65));
     refreshButton->setVisible(false);
@@ -143,10 +158,9 @@ bool TextureWorkshopLayer::init() {
         this,
         menu_selector(TextureWorkshopLayer::onPacksFolder)
     );
+    filesBtn->setID("files-button");
     buttonMenu->addChild(filesBtn);
     filesBtn->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 25));
-
-    
 
     inp = TextInput::create(300, "Search", "bigFont.fnt");
     inp->setContentHeight(20);
@@ -319,7 +333,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
     auto winSize = director->getWinSize();
     bool thing = false;
     scroll = ScrollLayer::create(ccp(313, 180));
-	scroll->setAnchorPoint(ccp(0, 0));
+    scroll->setAnchorPoint(ccp(0, 0));
     scroll->ignoreAnchorPointForPosition(false);
     int basePosY = 207;
     int tpCount = 0;
@@ -327,11 +341,11 @@ void TextureWorkshopLayer::onGetTPsFinished() {
     scroll->setZOrder(-1);
     scroll->setPositionX(0);
     scroll->setPositionY(8);
-	scroll->m_contentLayer->removeAllChildren();
-	
-	if (boobs::tpJson.is_object() && !search) {
-	    for (const auto& pair : boobs::tpJson.as_object()) {
-	        const auto& tpObject = pair.second;
+    scroll->m_contentLayer->removeAllChildren();
+    
+    if (boobs::tpJson.is_object() && !search) {
+        for (const auto& pair : boobs::tpJson.as_object()) {
+            const auto& tpObject = pair.second;
             std::string tpName;
             std::string tpCreator;
             std::string tpDownloadURL;
@@ -386,20 +400,20 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                 scroll->m_contentLayer->addChild(cell);
                 scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
             }     
-	
-	        float height = std::max<float>(scroll->getContentSize().height, 35 * scroll->m_contentLayer->getChildrenCount());
-	        scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
-	        CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
+    
+            float height = std::max<float>(scroll->getContentSize().height, 35 * scroll->m_contentLayer->getChildrenCount());
+            scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
+            CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
             int i = 0;
-	
-			for (auto* obj : objects) {
-	            i++;
-				obj->setPositionY(height - (35 * i));
-	
-			}
-	
-	        scroll->moveToTop();
-	    }
+    
+            for (auto* obj : objects) {
+                i++;
+                obj->setPositionY(height - (35 * i));
+    
+            }
+    
+            scroll->moveToTop();
+        }
 
         std::string countThing = fmt::format("{} Texture Packs", tps.size());
 
@@ -407,6 +421,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
             countThing.c_str(),
             "goldFont.fnt"
         );
+        tpAmount->setID("texture-pack-count-label");
         this->addChild(tpAmount);
         tpAmount->setPosition(winSize / 2);
         tpAmount->setScale(0.475);
@@ -458,19 +473,19 @@ void TextureWorkshopLayer::searchTPs() {
     float height = std::max<float>(scroll->getContentSize().height, 35 * content->getChildrenCount());
 
     scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
-	
-	CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
+    
+    CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
 
     int i = 0;
-	
-	
-	for (auto* obj : objects) {
-	    i++;
-		obj->setPositionY(height - (35 * i));
-	}
+    
+    
+    for (auto* obj : objects) {
+        i++;
+        obj->setPositionY(height - (35 * i));
+    }
 
-	
-	scroll->moveToTop();
+    
+    scroll->moveToTop();
 }
 
 
