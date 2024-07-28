@@ -9,7 +9,6 @@ using namespace geode::prelude;
 class TextureWorkshopLayer : public cocos2d::CCLayer, TextInputDelegate {
 protected:
     CCLayerGradient* m_background;
-    cocos2d::CCSpriteBatchNode* m_backgroundCubesContainer;
     void parseJson(std::string str);
     bool search = false;
     bool noresults = false;
