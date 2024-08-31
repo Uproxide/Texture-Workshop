@@ -257,7 +257,7 @@ void TextureWorkshopLayer::onSupport(CCObject*) {
 void TextureWorkshopLayer::onCredits(CCObject*) {
     FLAlertLayer::create(
         "Credits",
-        "<cg>Uproxide</c> - Main Developer\n<cr>TheSillyDoggo</c> - Help with Searching\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
+        "<cg>Uproxide</c> - Main Developer\n<co>ShineUA and Alphalaneous</c> - Pull Requests :3\n<cr>TheSillyDoggo</c> - Help with Searching\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
         "Ok"
     )->show();
 }
@@ -301,7 +301,7 @@ void TextureWorkshopLayer::getTexturePacks() {
 
         auto req = web::WebRequest();
         
-        m_listener.setFilter(req.get("https://uproxide.xyz/api/v1/tws/getTPs.php"));
+        m_listener.setFilter(req.get("https://textureworkshop.plusgdps.dev/api/v1/tws/getTPs"));
 
     } else {
         onGetTPsFinished();
