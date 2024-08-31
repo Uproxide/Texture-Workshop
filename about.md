@@ -17,5 +17,7 @@ And thats about it! I will read the submission and if it gets approved, ill add 
 
 ## Credits
 - Uproxide (Code and Everything Else)
+- M336 (Server)
+- Alphalaneous and ShineUA (Their PRs to TWS)
 - Riley (Emotional Support)
 - Brift (Concept Creator, Sprites, and Logo)
