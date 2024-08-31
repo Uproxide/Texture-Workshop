@@ -1,3 +1,7 @@
+# 1.3.3
+- Animated Background (Thanks ShineUA and Alphalaneous!)
+- New Server (Thanks M336!)
+  
 # 1.3.2
 - Fix crash on pretty much doing anything that calls onGetTPsFinished
 - Allow icons to be a different res than 336x336
