@@ -94,7 +94,7 @@ class TexturePackCell : public CCLayerColor {
             this->retain();
 
             if (!txtr) {
-                m_getIcon.bind([this, texturePackIconSpr, iconMenu, tp] (web::WebTask::Event* e) {
+                m_getIcon.bind([this, texturePackIconSpr, scale, tp] (web::WebTask::Event* e) {
                 if (web::WebResponse* res = e->getValue()) {
                     if (res->ok()) {
                         imgData = res->data();

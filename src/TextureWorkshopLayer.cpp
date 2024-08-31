@@ -257,7 +257,7 @@ void TextureWorkshopLayer::onSupport(CCObject*) {
 void TextureWorkshopLayer::onCredits(CCObject*) {
     FLAlertLayer::create(
         "Credits",
-        "<cg>Uproxide</c> - Main Developer\n<co>ShineUA and Alphalaneous</c> - Pull Requests :3\n<cr>TheSillyDoggo</c> - Help with Searching\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
+        "<cg>Uproxide</c> - Main Developer\n<co>ShineUA and Alphalaneous</c> - Pull Requests :3\n<cr>TheSillyDoggo</c> - Help with Searching\n<cr>M336</c> - Server\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
         "Ok"
     )->show();
 }
@@ -291,8 +291,11 @@ void TextureWorkshopLayer::getTexturePacks() {
     if (!boobs::downloaded) {
         m_listener.bind([this] (web::WebTask::Event* e) {
             if (web::WebResponse* res = e->getValue()) {
-                boobs::tpJson = res->json().value();
-                boobs::downloaded = true;
+                if (res->ok()) {
+                    boobs::tpJson = res->json().value();
+                    boobs::downloaded = true;
+                }
+                
                 onGetTPsFinished();
             } else if (e->isCancelled()) {
                 log::info("The request was cancelled... So sad :(");
