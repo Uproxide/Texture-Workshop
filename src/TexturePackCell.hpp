@@ -117,6 +117,7 @@ class TexturePackCell : public CCLayerColor {
                 });
 
                 auto req = web::WebRequest();
+                req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
                 
                 m_getIcon.setFilter(req.get(tp->icon));
             } else {
@@ -251,6 +252,7 @@ class TexturePackCell : public CCLayerColor {
             });
 
             auto req = web::WebRequest();
+            req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
             
             m_downloadTP.setFilter(req.get(texturePack->download));
         }

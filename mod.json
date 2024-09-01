@@ -32,6 +32,14 @@
 			"importance": "recommended"
 		}
 	],
+	"settings": {
+		"cert-verification": {
+			"name": "Cert Verification",
+			"description": "Enable Cert Verification",
+			"type": "bool",
+			"default": true
+		}
+	},
 	"tags": [
 		"universal", "utility", "interface", "enhancement", "customization"
 	],

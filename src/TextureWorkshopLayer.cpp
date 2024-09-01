@@ -267,8 +267,10 @@ void TextureWorkshopLayer::onRefresh(CCObject*) {
     scroll->removeFromParent();
     tpAmount->removeFromParent();
     refreshButton->setVisible(false);
-    scroll = nullptr;
-    tpAmount = nullptr;
+    if (scroll) {
+        scroll = nullptr;
+        tpAmount = nullptr;
+    }
     getTexturePacks();
 }
 
@@ -277,8 +279,10 @@ void TextureWorkshopLayer::onRefreshSearch(CCObject*) {
     scroll->removeFromParent();
     tpAmount->removeFromParent();
     refreshButton->setVisible(false);
-    scroll = nullptr;
-    tpAmount = nullptr;
+    if (scroll) {
+        scroll = nullptr;
+        tpAmount = nullptr;
+    }
     getTexturePacks();
 }
 
@@ -287,22 +291,31 @@ void TextureWorkshopLayer::onPacksFolder(CCObject*) {
 }
 
 void TextureWorkshopLayer::getTexturePacks() {
+    auto somethingWentWrong = CCLabelBMFont::create("", "bigFont.fnt");
+    this->addChild(somethingWentWrong);
+    somethingWentWrong->setScale(0.2);
 
     if (!boobs::downloaded) {
-        m_listener.bind([this] (web::WebTask::Event* e) {
+        m_listener.bind([this, somethingWentWrong] (web::WebTask::Event* e) {
             if (web::WebResponse* res = e->getValue()) {
                 if (res->ok()) {
+                    somethingWentWrong->setString("");
                     boobs::tpJson = res->json().value();
                     boobs::downloaded = true;
+                    onGetTPsFinished();
+                } else {
+                    std::string error = fmt::format("Something Went Wrong:\n{}", res->string().value());
+                    somethingWentWrong->setString(error.c_str());
+                    somethingWentWrong->setPosition(CCDirector::get()->getWinSize() / 2);
+                    refreshButton->setVisible(true);
                 }
-                
-                onGetTPsFinished();
             } else if (e->isCancelled()) {
                 log::info("The request was cancelled... So sad :(");
             }
         });
 
         auto req = web::WebRequest();
+        req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
         
         m_listener.setFilter(req.get("https://textureworkshop.plusgdps.dev/api/v1/tws/getTPs"));
 
