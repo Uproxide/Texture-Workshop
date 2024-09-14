@@ -194,7 +194,8 @@ public:
             });
 
             auto req = web::WebRequest();
-            
+            req.userAgent(fmt::format("TextureWorkshopMod/{}", Mod::get()->getVersion()));
+
             m_downloadTP.setFilter(req.get(texturePack->download));
     }
 

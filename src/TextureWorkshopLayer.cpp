@@ -315,6 +315,7 @@ void TextureWorkshopLayer::getTexturePacks() {
         });
 
         auto req = web::WebRequest();
+        req.userAgent(fmt::format("TextureWorkshopMod/{}", Mod::get()->getVersion()));
         req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
         
         m_listener.setFilter(req.get("https://textureworkshop.plusgdps.dev/api/v1/tws/getTPs"));
