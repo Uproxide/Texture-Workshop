@@ -5,7 +5,7 @@
 - Fixed being able to download a pack twice
 - Fixed missing Cert Verification toggle while getting the index
 - Added a User Agent
-  (This update wouldn't be possible without M336 and TheSillyDoggos contributions, Thank You!)
+(This update wouldn't be possible without M336 and TheSillyDoggos contributions, Thank You!)
 
 # 1.3.3
 - Animated Background (Thanks ShineUA and Alphalaneous!)
