@@ -265,12 +265,6 @@ class TexturePackCell : public CCLayerColor {
 
         void onDownload(CCObject*) {
             texturePack->downloadPack();
-
-            auto req = web::WebRequest();
-            req.userAgent(fmt::format("TextureWorkshopMod/{}", Mod::get()->getVersion()));
-            req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
-            
-            m_downloadTP.setFilter(req.get(texturePack->download));
             updateDownloadIndicator();
         }
 
