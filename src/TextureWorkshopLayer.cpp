@@ -198,6 +198,13 @@ bool TextureWorkshopLayer::init() {
     inpMenu->setPosition(inp->getContentSize() / 2);
     filterBtn->setPositionX(filterBtn->getPositionX() + 5);
 
+    loading = LoadingCircleSprite::create();
+    loading->runAction(CCRepeatForever::create(CCRotateBy::create(1, 360)));
+    loading->setID("loading");
+    loading->setScale(0.6f);
+    loading->setPosition(ccp(outline->getContentWidth() / 2, outline->getContentHeight() / 2 + -21.875f));
+    outline->addChild(loading);
+
     getTexturePacks();
 
     if (auto available = Mod::get()->hasAvailableUpdate()) {
@@ -264,6 +271,7 @@ void TextureWorkshopLayer::onCredits(CCObject*) {
 
 void TextureWorkshopLayer::onRefresh(CCObject*) {
     boobs::downloaded = false;
+    loading->setVisible(!boobs::downloaded);
     scroll->removeFromParent();
     tpAmount->removeFromParent();
     refreshButton->setVisible(false);
@@ -345,6 +353,8 @@ void TextureWorkshopLayer::onGetTPsFinished() {
         scroll->removeFromParent();
         tpAmount->removeFromParent();
     }
+
+    // leaking memory my beloved (it breaks a bunch of things if its fixed to just keep it there :3)
     tps.clear();
     auto director = CCDirector::sharedDirector();
     auto winSize = director->getWinSize();
@@ -371,6 +381,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
             std::string tpDesc;
             std::string gdVersion;
             bool featured;
+            int downloads;
 
             tpName = tpObject["packName"].as_string();
             tpCreator = tpObject["packCreator"].as_string();
@@ -379,6 +390,9 @@ void TextureWorkshopLayer::onGetTPsFinished() {
             tpIcon = tpObject["packLogo"].as_string();
             tpDesc = tpObject["packDescription"].as_string();
             gdVersion = tpObject["gdVersion"].as_string();
+
+            if (tpObject.contains("packDownloads")) // idk but i wanna be safe
+                downloads = tpObject["packDownloads"].as_int();
 
             if (tpObject["packFeature"].as_int() == 1) {
                 featured = true;
@@ -392,7 +406,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
 
             if (boobs::versionFilter) {
                 if (tpObject["gdVersion"].as_string() == Loader::get()->getGameVersion() || tpObject["gdVersion"].as_string() == "Any") {
-                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                     auto cell = TexturePackCell::create(tp, thing);
                     tps.push_back(tp);
@@ -400,7 +414,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                     scroll->m_contentLayer->addChild(cell);
                     scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
                 } else if (tpObject["gdVersion"].as_string() == "2.204" && (Loader::get()->getGameVersion() == "2.204" || Loader::get()->getGameVersion() == "2.205")) {
-                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                     auto cell = TexturePackCell::create(tp, thing);
                     tps.push_back(tp);
@@ -409,7 +423,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                     scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
                 }
             } else {
-                TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured);
+                TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                 auto cell = TexturePackCell::create(tp, thing);
                 tps.push_back(tp);
@@ -449,6 +463,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
         
     }
 
+    loading->setVisible(!boobs::downloaded);
 }
 
 void TextureWorkshopLayer::textChanged(CCTextInputNode* p0){
@@ -513,4 +528,9 @@ void TextureWorkshopLayer::keyBackClicked() {
 void TextureWorkshopLayer::onClose(CCObject*) {
     auto mainMenu = MenuLayer::scene(false);
     CCDirector::sharedDirector()->pushScene(CCTransitionFade::create(0.5f, mainMenu));
+}
+
+TextureWorkshopLayer::~TextureWorkshopLayer()
+{
+    get = nullptr;
 }

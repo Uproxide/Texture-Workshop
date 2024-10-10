@@ -23,8 +23,12 @@ protected:
     std::string inputText;
     EventListener<web::WebTask> m_listener;
 
+    LoadingCircleSprite* loading;
+
 
     virtual void textChanged(CCTextInputNode* p0);
+
+    ~TextureWorkshopLayer();
     
 public:
     static TextureWorkshopLayer* create();
