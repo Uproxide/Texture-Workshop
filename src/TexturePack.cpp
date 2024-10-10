@@ -48,6 +48,7 @@ void TexturePack::downloadPack()
     auto req = web::WebRequest();
         
     m_downloadTP.setFilter(req.get(download));
+    req.userAgent(fmt::format("TextureWorkshopMod/{}", Mod::get()->getVersion()));
     req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
 
     boobs::downloads.push_back(this);
