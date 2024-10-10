@@ -9,6 +9,8 @@ project(TWS VERSION 1.3.1)
 add_library(${PROJECT_NAME} SHARED
     src/boobs.cpp
     src/TextureWorkshopLayer.cpp
+    src/TexturePack.cpp
+    src/TexturePackInfo.cpp
     # Add your cpp files here
 )
 

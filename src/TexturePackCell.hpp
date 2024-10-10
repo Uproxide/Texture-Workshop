@@ -24,7 +24,9 @@ class TexturePackCell : public CCLayerColor {
 
         TexturePack* texturePack;
 
-        EventListener<web::WebTask> m_downloadTP;
+        Slider* downloadProgressSlider;
+        CCMenuItemSpriteExtra* downloadButton;
+
         EventListener<web::WebTask> m_getIcon;
 
 
@@ -34,6 +36,8 @@ class TexturePackCell : public CCLayerColor {
 
             thingy = thing;
             texturePack = tp;
+
+            texturePack->cell = this;
 
             if (thing) {
                 this->setOpacity(100);
@@ -178,12 +182,24 @@ class TexturePackCell : public CCLayerColor {
             texturePackVersion->setAnchorPoint(ccp(0, 0.5));
             texturePackVersion->setColor(ccc3(0, 200, 255));
 
+            auto texturePackDownloadsIcon = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
+            texturePackDownloadsIcon->setScale(0.325f);
+            texturePackDownloadsIcon->setPosition(texturePackVersion->getPosition() + ccp(texturePackVersion->getScaledContentWidth() + 8, -0.5f));
+            this->addChild(texturePackDownloadsIcon);
+
+            auto texturePackDownloadsCount = CCLabelBMFont::create(fmt::format("{}", texturePack->downloads).c_str(), "bigFont.fnt");
+            texturePackDownloadsCount->setScale(0.25f);
+            texturePackDownloadsCount->setAnchorPoint(ccp(0, 0.5f));
+            texturePackDownloadsCount->setColor(ccc3(100, 200, 35));
+            texturePackDownloadsCount->setPosition(texturePackDownloadsIcon->getPosition() + ccp(4, 0.5f));
+            this->addChild(texturePackDownloadsCount);
+
 
             auto viewBtnMenu = CCMenu::create();
 
             auto downloadButtonSpr = CCSprite::createWithSpriteFrameName("TWS_DownloadButton.png"_spr);
             downloadButtonSpr->setScale(0.55);
-            auto downloadButton = CCMenuItemSpriteExtra::create(
+            downloadButton = CCMenuItemSpriteExtra::create(
                 downloadButtonSpr,
                 this,
                 menu_selector(TexturePackCell::onDownload)
@@ -205,6 +221,17 @@ class TexturePackCell : public CCLayerColor {
                 menu_selector(TexturePackCell::onDelete)
             );
 
+            downloadProgressSlider = Slider::create(this, nullptr);
+            downloadProgressSlider->getThumb()->setVisible(false);
+            downloadProgressSlider->m_sliderBar->setVisible(true);
+            downloadProgressSlider->setPosition(getContentSize() * ccp(1, 0.5f) + ccp(-80, 0));
+            downloadProgressSlider->setAnchorPoint(CCPointZero);
+            downloadProgressSlider->setScaleX(0.35f);
+            downloadProgressSlider->setScaleY(0.5f);
+
+            this->addChild(downloadProgressSlider);
+            texturePack->slider = downloadProgressSlider;
+
             if (!std::filesystem::exists(filePath)) {
                 viewBtnMenu->addChild(downloadButton);
             } else if (std::filesystem::exists(filePath) && Mod::get()->getSavedValue<std::string>(versionSaveThing) != tp->version) {
@@ -225,6 +252,8 @@ class TexturePackCell : public CCLayerColor {
                     ->setAxisAlignment(AxisAlignment::End)
             );
 
+            updateDownloadIndicator();
+
             return true;
         }
 
@@ -234,27 +263,9 @@ class TexturePackCell : public CCLayerColor {
         }
 
         void onDownload(CCObject*) {
-            m_downloadTP.bind([this] (web::WebTask::Event* e) {
-                if (web::WebResponse* res = e->getValue()) {
-                    if (res->into(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name))) {
-                        std::string versionSaveThing = fmt::format("{} Version", texturePack->name);
-                        Mod::get()->setSavedValue<std::string>(versionSaveThing, texturePack->version);
-                        Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
-                        TextureWorkshopLayer::get->onRefresh(nullptr);
-                    } else {
-                        Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
-                        std::filesystem::remove(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name));
-                    }
-                    
-                } else if (e->isCancelled()) {
-                    log::info("The request was cancelled... So sad :(");
-                }
-            });
+            texturePack->downloadPack();
 
-            auto req = web::WebRequest();
-            req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
-            
-            m_downloadTP.setFilter(req.get(texturePack->download));
+            updateDownloadIndicator();
         }
 
         void onCreator(CCObject*) {
@@ -278,6 +289,12 @@ class TexturePackCell : public CCLayerColor {
             );
         }
 
+        void updateDownloadIndicator()
+        {
+            downloadButton->setVisible(!texturePack->isDownloading());
+            downloadProgressSlider->setVisible(texturePack->isDownloading());
+        }
+
         static TexturePackCell* create(TexturePack* tp, bool thing) {
             TexturePackCell* pRet = new TexturePackCell();
             if (pRet && pRet->init(tp, thing)) {
@@ -287,6 +304,12 @@ class TexturePackCell : public CCLayerColor {
                 delete pRet;
                 return nullptr;
             }
+        }
+
+        ~TexturePackCell()
+        {
+            texturePack->slider = nullptr;
+            texturePack->cell = nullptr;
         }
 
 };

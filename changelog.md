@@ -1,3 +1,9 @@
+# 1.3.4
+
+- Added Download Progress Bar
+- Added Pack Download Counter
+- Fixed being able to download a pack twice
+
 # 1.3.3
 - Animated Background (Thanks ShineUA and Alphalaneous!)
 - New Server (Thanks M336!)
