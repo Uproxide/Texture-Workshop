@@ -8,6 +8,8 @@
 #include <cctype>
 #include <algorithm>
 #include "TexturePack.hpp"
+#include "boobs.hpp"
+#include "TextureWorkshopLayer.hpp"
 
 using namespace geode::prelude;
 
@@ -16,8 +18,9 @@ class TexturePackInfo : public Popup<TexturePack*> {
 public:
 
     TexturePack* texturePack;
-
-    EventListener<web::WebTask> m_downloadTP;
+    CCMenuItemSpriteExtra* downloadButton;
+    CCMenuItemSpriteExtra* deleteButton;
+    Slider* downloadProgressSlider;
 
     bool setup(TexturePack* tp) {
         log::info("hai");
@@ -25,6 +28,7 @@ public:
         m_noElasticity = true;
 
         texturePack = tp;
+        texturePack->popup = this;
 
         std::filesystem::path filePath = fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), tp->name);
 
@@ -139,7 +143,7 @@ public:
 
         auto downloadButtonSpr = CCSprite::createWithSpriteFrameName("TWS_DownloadButton.png"_spr);
         downloadButtonSpr->setScale(.5);
-        auto downloadButton = CCMenuItemSpriteExtra::create(
+        downloadButton = CCMenuItemSpriteExtra::create(
             downloadButtonSpr,
             this,
             menu_selector(TexturePackInfo::onDownload)
@@ -147,7 +151,7 @@ public:
 
         auto deleteButtonSpr = CCSprite::createWithSpriteFrameName("TWS_DeleteButton.png"_spr);
         deleteButtonSpr->setScale(.5);
-        auto deleteButton = CCMenuItemSpriteExtra::create(
+        deleteButton = CCMenuItemSpriteExtra::create(
             deleteButtonSpr,
             this,
             menu_selector(TexturePackInfo::onDelete)
@@ -161,6 +165,8 @@ public:
         if (!std::filesystem::exists(filePath)) {
             viewBtnMenu->addChild(downloadButton);
             downloadButton->setPosition(downloadButtonSpr->getContentSize() / 2);
+
+            deleteButton = nullptr; // its not added so i dont wanna crash
         } else {
             viewBtnMenu->addChild(deleteButton);
             deleteButton->setPosition(downloadButtonSpr->getContentSize() / 2);
@@ -170,33 +176,21 @@ public:
         viewBtnMenu->setPositionX(viewBtnMenu->getPositionX() + 150);
         viewBtnMenu->setPositionY(viewBtnMenu->getPositionY() + 53);
 
+        downloadProgressSlider = Slider::create(this, nullptr);
+        downloadProgressSlider->getThumb()->setVisible(false);
+        downloadProgressSlider->m_sliderBar->setVisible(true);
+        downloadProgressSlider->setAnchorPoint(CCPointZero);
+        downloadProgressSlider->setScale(0.5f);
+
+        m_mainLayer->addChildAtPosition(downloadProgressSlider, Anchor::TopRight, ccp(-65, -20));
+        texturePack->slider2 = downloadProgressSlider;
+
+        updateDownloadIndicator();
+
         return true;
     }
 
-    void onDownload(CCObject*) {
-        std::string fileName = fmt::format("{}/packs/{}.zip", Loader::get()->getLoadedMod("geode.texture-loader")->getConfigDir(), texturePack->name);
-        m_downloadTP.bind([this] (web::WebTask::Event* e) {
-                if (web::WebResponse* res = e->getValue()) {
-                    if (res->into(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name))) {
-                        std::string versionSaveThing = fmt::format("{} Version", texturePack->name);
-                        Mod::get()->setSavedValue<std::string>(versionSaveThing, texturePack->version);
-                        Notification::create("Download Successful", CCSprite::createWithSpriteFrameName("GJ_completesIcon_001.png"))->show();
-                        this->onClose(nullptr);
-                        TextureWorkshopLayer::get->onRefresh(nullptr);
-                    } else {
-                        Notification::create("Download Failed", CCSprite::createWithSpriteFrameName("GJ_deleteIcon_001.png"))->show();
-                        std::filesystem::remove(fmt::format("{}/packs/{}.zip", Loader::get()->getInstalledMod("geode.texture-loader")->getConfigDir(), texturePack->name));
-                    }
-                    
-                } else if (e->isCancelled()) {
-                    log::info("The request was cancelled... So sad :(");
-                }
-            });
-
-            auto req = web::WebRequest();
-            
-            m_downloadTP.setFilter(req.get(texturePack->download));
-    }
+    void onDownload(CCObject*);
 
     void onDelete(CCObject*) {
             geode::createQuickPopup(
@@ -215,7 +209,12 @@ public:
             );
         }
 
-
+    void updateDownloadIndicator()
+    {
+        downloadButton->setVisible(!texturePack->isDownloading());
+        downloadProgressSlider->setVisible(texturePack->isDownloading());
+        as<AnchorLayoutOptions*>(downloadProgressSlider->getLayoutOptions())->setOffset(ccp(-65, -20) + ccp((deleteButton && deleteButton->isVisible()) ? -15 : 0, 0));
+    }
 
     static TexturePackInfo* create(TexturePack* tp) {
         auto ret = new TexturePackInfo();
@@ -225,5 +224,11 @@ public:
         }
         CC_SAFE_DELETE(ret);
         return nullptr;
+    }
+
+    ~TexturePackInfo()
+    {
+        texturePack->popup = nullptr;
+        texturePack->slider2 = nullptr;
     }
 };
