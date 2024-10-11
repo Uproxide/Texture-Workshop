@@ -18,6 +18,7 @@ class TexturePackCell : public CCLayerColor {
 
         bool thingy;
         int opacity;
+        bool dontSetOpacity;
 
         geode::ByteVector imgData;
         CCLayerGradient* gradient;
@@ -26,9 +27,24 @@ class TexturePackCell : public CCLayerColor {
 
         Slider* downloadProgressSlider;
         CCMenuItemSpriteExtra* downloadButton;
+        Ref<CCMenuItemSpriteExtra> stopDownloadButton;
+        CCMenu* viewBtnMenu;
 
         EventListener<web::WebTask> m_getIcon;
 
+        void updateBG(bool darker)
+        {
+            if (dontSetOpacity)
+                return;
+
+            if (darker) {
+                this->setOpacity(100);
+                opacity = 100;
+            } else {
+                this->setOpacity(50); 
+                opacity = 50;
+            }
+        }
 
         bool init(TexturePack* tp, bool thing) {
             if (!CCLayerColor::init())
@@ -39,13 +55,7 @@ class TexturePackCell : public CCLayerColor {
 
             texturePack->cell = this;
 
-            if (thing) {
-                this->setOpacity(100);
-                opacity = 100;
-            } else {
-                this->setOpacity(50); 
-                opacity = 50;
-            }
+            updateBG(thing);
 
             this->setContentSize(ccp(315, 35));
             this->setAnchorPoint(ccp(0, 1));
@@ -68,16 +78,17 @@ class TexturePackCell : public CCLayerColor {
                     gradient->setZOrder(-3);
                     gradient->setVector(ccp(90, 0));
                     this->addChild(gradient);
-                    this->setOpacity(0); 
+                    this->setOpacity(0);
                 } else {
                     gradient = CCLayerGradient::create(ccc4(0, 0, 0, 100), ccc4(94, 137, 255, 100));
                     gradient->setContentSize(this->getContentSize());
                     gradient->setZOrder(-3);
                     gradient->setVector(ccp(90, 0));
                     this->addChild(gradient);
-                    this->setOpacity(0); 
+                    this->setOpacity(0);
                 }
                 
+                dontSetOpacity = true;
             }
 
             if (tp->featured) {
@@ -196,7 +207,7 @@ class TexturePackCell : public CCLayerColor {
             this->addChild(texturePackDownloadsCount);
 
 
-            auto viewBtnMenu = CCMenu::create();
+            viewBtnMenu = CCMenu::create();
 
             auto downloadButtonSpr = CCSprite::createWithSpriteFrameName("TWS_DownloadButton.png"_spr);
             downloadButtonSpr->setScale(0.55);
@@ -204,6 +215,14 @@ class TexturePackCell : public CCLayerColor {
                 downloadButtonSpr,
                 this,
                 menu_selector(TexturePackCell::onDownload)
+            );
+
+            auto stopDownloadButtonSpr = CCSprite::createWithSpriteFrameName("TWS_DeleteButton.png"_spr);
+            stopDownloadButtonSpr->setScale(0.55);
+            stopDownloadButton = CCMenuItemSpriteExtra::create(
+                stopDownloadButtonSpr,
+                this,
+                menu_selector(TexturePackCell::onStopDownload)
             );
 
             auto viewButtonSpr = CCSprite::createWithSpriteFrameName("TWS_InfoButton.png"_spr);
@@ -225,7 +244,7 @@ class TexturePackCell : public CCLayerColor {
             downloadProgressSlider = Slider::create(this, nullptr);
             downloadProgressSlider->getThumb()->setVisible(false);
             downloadProgressSlider->m_sliderBar->setVisible(true);
-            downloadProgressSlider->setPosition(getContentSize() * ccp(1, 0.5f) + ccp(-80, 0));
+            downloadProgressSlider->setPosition(getContentSize() * ccp(1, 0.5f) + ccp(-80 - 85 * 0.35f, 0));
             downloadProgressSlider->setAnchorPoint(CCPointZero);
             downloadProgressSlider->setScaleX(0.35f);
             downloadProgressSlider->setScaleY(0.5f);
@@ -234,15 +253,15 @@ class TexturePackCell : public CCLayerColor {
             texturePack->slider = downloadProgressSlider;
 
             if (!std::filesystem::exists(filePath)) {
-                viewBtnMenu->addChild(downloadButton);
+                viewBtnMenu->addChild(downloadButton, -5);
             } else if (std::filesystem::exists(filePath) && Mod::get()->getSavedValue<std::string>(versionSaveThing) != tp->version) {
-                viewBtnMenu->addChild(downloadButton);
+                viewBtnMenu->addChild(downloadButton, -5);
             } else {
-                viewBtnMenu->addChild(deleteButton);
+                viewBtnMenu->addChild(deleteButton, -5);
             }
 
             this->addChild(viewBtnMenu);
-            viewBtnMenu->addChild(viewButton);
+            viewBtnMenu->addChild(viewButton, 1);
             viewBtnMenu->setPosition(305, 17.5);
             viewBtnMenu->setAnchorPoint(ccp(1, 0.5));
             viewBtnMenu->setContentSize(viewButton->getContentSize());
@@ -265,6 +284,18 @@ class TexturePackCell : public CCLayerColor {
 
         void onDownload(CCObject*) {
             texturePack->downloadPack();
+            updateDownloadIndicator();
+        }
+
+        void onStopDownload(CCObject* sender)
+        {
+            boobs::downloads.erase(std::find(boobs::downloads.begin(), boobs::downloads.end(), texturePack));
+
+            texturePack->m_downloadTP.getFilter().cancel();
+            texturePack->m_downloadTP.setFilter({});
+
+            Notification::create("Download Cancelled", NotificationIcon::Success)->show();
+
             updateDownloadIndicator();
         }
 
@@ -293,6 +324,15 @@ class TexturePackCell : public CCLayerColor {
         {
             downloadButton->setVisible(!texturePack->isDownloading());
             downloadProgressSlider->setVisible(texturePack->isDownloading());
+            stopDownloadButton->setVisible(texturePack->isDownloading());
+
+            if (!texturePack->isDownloading() && stopDownloadButton->getParent())
+                viewBtnMenu->removeChild(stopDownloadButton, false);
+
+            if (texturePack->isDownloading() && !stopDownloadButton->getParent())
+                viewBtnMenu->addChild(stopDownloadButton, -1);
+
+            viewBtnMenu->updateLayout();
         }
 
         static TexturePackCell* create(TexturePack* tp, bool thing) {

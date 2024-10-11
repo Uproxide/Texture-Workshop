@@ -13,6 +13,7 @@ using namespace geode::prelude;
 #include <Geode/loader/Event.hpp>
 #include "boobs.hpp"
 #include "TWSFilters.hpp"
+#include "BlockTouchLayer.hpp"
 
 TextureWorkshopLayer* TextureWorkshopLayer::create() {
     auto ret = new TextureWorkshopLayer();
@@ -101,6 +102,15 @@ bool TextureWorkshopLayer::init() {
     outline->setScale(1.2);
     outline->setZOrder(1);
 
+    auto block = BlockTouchLayer::create();
+    block->ignoreAnchorPointForPosition(false);
+    block->setAnchorPoint(ccp(0, 0.5f));
+    block->setPositionY(outline->getContentHeight());
+    block->setContentSize(ccp(block->getContentWidth(), 25));
+    block->setTouchEnabled(true);
+
+    outline->addChild(block);
+
     buttonMenu = CCMenu::create();
     buttonMenu->setID("button-menu");
     addChild(buttonMenu, 1);
@@ -179,6 +189,8 @@ bool TextureWorkshopLayer::init() {
     inp->setCommonFilter(CommonFilter::Any);
 
     auto inpMenu = CCMenu::create();
+    inpMenu->setTouchPriority(-130);
+    inpMenu->onEnter();
     inpMenu->setContentSize(inp->getContentSize());
     inp->addChild(inpMenu);
     
@@ -369,6 +381,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
     scroll->setPositionX(0);
     scroll->setPositionY(8);
     scroll->m_contentLayer->removeAllChildren();
+    cells.clear();
     
     if (boobs::tpJson.is_object() && !search) {
         for (const auto& pair : boobs::tpJson.as_object()) {
@@ -409,6 +422,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                     TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                     auto cell = TexturePackCell::create(tp, thing);
+                    cells.push_back(cell);
                     tps.push_back(tp);
                     cell->setPositionY(basePosY);
                     scroll->m_contentLayer->addChild(cell);
@@ -417,6 +431,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                     TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                     auto cell = TexturePackCell::create(tp, thing);
+                    cells.push_back(cell);
                     tps.push_back(tp);
                     cell->setPositionY(basePosY);
                     scroll->m_contentLayer->addChild(cell);
@@ -426,6 +441,7 @@ void TextureWorkshopLayer::onGetTPsFinished() {
                 TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
 
                 auto cell = TexturePackCell::create(tp, thing);
+                cells.push_back(cell);
                 tps.push_back(tp);
                 cell->setPositionY(basePosY);
                 scroll->m_contentLayer->addChild(cell);
@@ -473,50 +489,51 @@ void TextureWorkshopLayer::textChanged(CCTextInputNode* p0){
 void TextureWorkshopLayer::searchTPs() {
     auto content = scroll->m_contentLayer;
 
-    bool thing = false;
+    content->removeAllChildrenWithCleanup(false);
 
-    content->removeAllChildren();
+    std::vector<TexturePackCell*> cellsToAdd;
 
-    for (size_t i = 0; i < tps.size(); i++)
+    for (auto cell : cells)
     {
-        thing = !thing;
-
         auto name = inp->getString();
 
         if (inp->getString().starts_with("by:")) {
-                if(utils::string::toLower(tps[i]->creator).find(utils::string::toLower(name.substr(name.find(":") + 1, name.size() - name.find(":")))) != std::string::npos)
-                {
-                    auto cell = TexturePackCell::create(tps[i], thing);
-
-                    content->addChild(cell);
-                }
-            } else {
-                if (utils::string::toLower(tps[i]->name).find(utils::string::toLower(inp->getString())) != std::string::npos)
-                {
-                    auto cell = TexturePackCell::create(tps[i], thing);
-
-                    content->addChild(cell);
-                }
+            if(utils::string::toLower(as<TexturePackCell*>(cell.data())->texturePack->creator).find(utils::string::toLower(name.substr(name.find(":") + 1, name.size() - name.find(":")))) != std::string::npos)
+            {
+                cellsToAdd.push_back(as<TexturePackCell*>(cell.data()));
+            }
+        } else {
+            if (utils::string::toLower(as<TexturePackCell*>(cell.data())->texturePack->name).find(utils::string::toLower(inp->getString())) != std::string::npos)
+            {
+                cellsToAdd.push_back(as<TexturePackCell*>(cell.data()));
             }
         }
-    
-    
+    }
 
-    float height = std::max<float>(scroll->getContentSize().height, 35 * content->getChildrenCount());
-
+    float height = std::max<float>(scroll->getContentSize().height, 35 * cellsToAdd.size());
     scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
+
+    int i = 0;
+
+    for (auto cell : cellsToAdd)
+    {
+        // literally have no idea what % does but i stole it from google
+        cell->updateBG(i % 2 == 0);
+
+        content->addChild(cell);
+
+        i++;
+    }
     
     CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
 
-    int i = 0;
-    
+    i = 0;
     
     for (auto* obj : objects) {
         i++;
         obj->setPositionY(height - (35 * i));
     }
 
-    
     scroll->moveToTop();
 }
 
