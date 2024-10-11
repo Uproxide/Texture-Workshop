@@ -25,6 +25,8 @@ protected:
 
     LoadingCircleSprite* loading;
 
+    std::vector<Ref<CCNode>> cells; // ref manages memory correctly i think :3
+
 
     virtual void textChanged(CCTextInputNode* p0);
 

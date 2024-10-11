@@ -1,3 +1,9 @@
+# 1.3.5
+
+- Added cancel download button
+- Fixed being able to click through search input
+- Fixed lag when searching
+
 # 1.3.4
 
 - Added Download Progress Bar
