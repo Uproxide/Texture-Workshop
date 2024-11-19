@@ -6,7 +6,7 @@ and that mostly comes out my pocket
 
 But YOU Could Help!
 
-By visiting the kofi and donating, you will get a special role in the discord server and my eternal thanks :3
+By visiting the patreon and donating, you will get a special role in the discord server and my eternal thanks :3
 Thanks again for using my stupid little mods!
 
-https://ko-fi.com/uproxide
+https://patreon.com/uproxide

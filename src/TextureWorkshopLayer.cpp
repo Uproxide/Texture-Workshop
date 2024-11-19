@@ -197,8 +197,9 @@ bool TextureWorkshopLayer::init() {
     );
     inpMenu->setPosition(inp->getContentSize() / 2);
     filterBtn->setPositionX(filterBtn->getPositionX() + 5);
+    inpMenu->setTouchPriority(-129);
 
-    loading = LoadingCircleSprite::create();
+    loading = LoadingCircleSprite::create(20);
     loading->runAction(CCRepeatForever::create(CCRotateBy::create(1, 360)));
     loading->setID("loading");
     loading->setScale(0.6f);
@@ -206,27 +207,6 @@ bool TextureWorkshopLayer::init() {
     outline->addChild(loading);
 
     getTexturePacks();
-
-    if (auto available = Mod::get()->hasAvailableUpdate()) {
-         auto popup = createQuickPopup(
-            "Update Available!",
-            fmt::format(
-                "<cl>Texture Workshop</c> has a new update!\n<ca>{}</c> -> <cg>{}</c>\n\n"
-                "Would you like to <cj>Update?</c>",
-                Mod::get()->getVersion(),
-                available.value()
-            ),
-            "OK", "Update",
-            [](auto, bool btn2) {
-                if (btn2) {
-                    openInfoPopup(Mod::get());
-                }
-            },
-            false
-        );
-        popup->m_scene = this;
-        popup->show();
-    }
 
     return true;
 }
@@ -251,11 +231,11 @@ void TextureWorkshopLayer::onFilter(CCObject*) {
 void TextureWorkshopLayer::onSupport(CCObject*) {
     geode::createQuickPopup(
         "Support Me",
-        "Making mods like this is fun, and thats thanks to you! if you want to support my shinanigans, Please support me on Ko-Fi!",
+        "Making mods like this is fun, and thats thanks to you! if you want to support my shinanigans, Please support me on Patreon!",
         "No Thanks", "Ok",
         [](auto, bool btn2) {
             if (btn2) {
-                geode::utils::web::openLinkInBrowser("https://ko-fi.com/uproxide");
+                geode::utils::web::openLinkInBrowser("https://patreon.com/uproxide");
             }
         }
     );
@@ -272,11 +252,13 @@ void TextureWorkshopLayer::onCredits(CCObject*) {
 void TextureWorkshopLayer::onRefresh(CCObject*) {
     boobs::downloaded = false;
     loading->setVisible(!boobs::downloaded);
-    scroll->removeFromParent();
-    tpAmount->removeFromParent();
     refreshButton->setVisible(false);
     if (scroll) {
+        scroll->removeFromParent();
         scroll = nullptr;
+    }
+    if (tpAmount) {
+        tpAmount->removeFromParent();
         tpAmount = nullptr;
     }
     getTexturePacks();
@@ -288,7 +270,11 @@ void TextureWorkshopLayer::onRefreshSearch(CCObject*) {
     tpAmount->removeFromParent();
     refreshButton->setVisible(false);
     if (scroll) {
+        scroll->removeFromParent();
         scroll = nullptr;
+    }
+    if (tpAmount) {
+        tpAmount->removeFromParent();
         tpAmount = nullptr;
     }
     getTexturePacks();
@@ -308,11 +294,18 @@ void TextureWorkshopLayer::getTexturePacks() {
             if (web::WebResponse* res = e->getValue()) {
                 if (res->ok()) {
                     somethingWentWrong->setString("");
-                    boobs::tpJson = res->json().value();
+                    //geode::log::debug("{}", e->getValue()->string().unwrap());
+                    boobs::tpJson = res->json().unwrapOr("failed");
+                    if (boobs::tpJson == "failed") {
+                        std::string error = fmt::format("Something Went Wrong!");
+                        somethingWentWrong->setString(error.c_str());
+                        somethingWentWrong->setPosition(CCDirector::get()->getWinSize() / 2);
+                        refreshButton->setVisible(true);
+                    }
                     boobs::downloaded = true;
                     onGetTPsFinished();
                 } else {
-                    std::string error = fmt::format("Something Went Wrong:\n{}", res->string().value());
+                    std::string error = fmt::format("Something Went Wrong! {}", res->code());
                     somethingWentWrong->setString(error.c_str());
                     somethingWentWrong->setPosition(CCDirector::get()->getWinSize() / 2);
                     refreshButton->setVisible(true);
@@ -323,10 +316,10 @@ void TextureWorkshopLayer::getTexturePacks() {
         });
 
         auto req = web::WebRequest();
-        req.userAgent(fmt::format("TextureWorkshopMod/{}", Mod::get()->getVersion()));
+        // req.userAgent(fmt::format("TextureWorkshopMod/{}", "1.3.3"));
         req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
         
-        m_listener.setFilter(req.get("https://textureworkshop.plusgdps.dev/api/v1/tws/getTPs"));
+        m_listener.setFilter(req.get("http://textureworkshop.plusgdps.dev/api/v1/tws/getTPs"));
 
     } else {
         onGetTPsFinished();
@@ -339,8 +332,8 @@ void TextureWorkshopLayer::parseJson(std::string str) {
         
     } else {
         try {
-            boobs::tpJson = matjson::parse(str);
-            log::info("{}", boobs::tpJson);
+            boobs::tpJson = matjson::parse(str).unwrap();
+            // log::info("{}", boobs::tpJson);
         } catch (const std::exception& e) {
             log::error("Failed to parse JSON: {}", e.what());
         }
@@ -369,102 +362,109 @@ void TextureWorkshopLayer::onGetTPsFinished() {
     scroll->setPositionX(0);
     scroll->setPositionY(8);
     scroll->m_contentLayer->removeAllChildren();
+
+    // auto tpArray = boobs::tpJson();
+
+    log::info("{}", boobs::tpJson.isArray());
     
-    if (boobs::tpJson.is_object() && !search) {
-        for (const auto& pair : boobs::tpJson.as_object()) {
-            const auto& tpObject = pair.second;
-            std::string tpName;
-            std::string tpCreator;
-            std::string tpDownloadURL;
-            std::string tpDownloadVersion;
-            std::string tpIcon;
-            std::string tpDesc;
-            std::string gdVersion;
-            bool featured;
-            int downloads;
+    if (boobs::tpJson.isObject() && !search) {
+            for (auto& value : boobs::tpJson) {
+                auto tpObject = value;
+                std::string tpName;
+                std::string tpCreator;
+                std::string tpDownloadURL;
+                std::string tpDownloadVersion;
+                std::string tpIcon;
+                std::string tpDesc;
+                std::string gdVersion;
+                bool featured;
+                int downloads;
 
-            tpName = tpObject["packName"].as_string();
-            tpCreator = tpObject["packCreator"].as_string();
-            tpDownloadURL = tpObject["downloadLink"].as_string();
-            tpDownloadVersion = tpObject["packVersion"].as_string();
-            tpIcon = tpObject["packLogo"].as_string();
-            tpDesc = tpObject["packDescription"].as_string();
-            gdVersion = tpObject["gdVersion"].as_string();
+                tpName = tpObject["packName"].asString().unwrap();
+                tpCreator = tpObject["packCreator"].asString().unwrap();
+                tpDownloadURL = tpObject["downloadLink"].asString().unwrap();
+                tpDownloadVersion = tpObject["packVersion"].asString().unwrap();
+                tpIcon = tpObject["packLogo"].asString().unwrap();
+                tpDesc = tpObject["packDescription"].asString().unwrap();
+                gdVersion = tpObject["gdVersion"].asString().unwrap();
 
-            if (tpObject.contains("packDownloads")) // idk but i wanna be safe
-                downloads = tpObject["packDownloads"].as_int();
+                if (tpObject.contains("packDownloads")) // idk but i wanna be safe
+                    downloads = tpObject["packDownloads"].asInt().unwrap();
 
-            if (tpObject["packFeature"].as_int() == 1) {
-                featured = true;
-            } else {
-                featured = false;
-            }
-            
-            thing = !thing;
-
-            tpCount += 1;
-
-            if (boobs::versionFilter) {
-                if (tpObject["gdVersion"].as_string() == Loader::get()->getGameVersion() || tpObject["gdVersion"].as_string() == "Any") {
-                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
-
-                    auto cell = TexturePackCell::create(tp, thing);
-                    tps.push_back(tp);
-                    cell->setPositionY(basePosY);
-                    scroll->m_contentLayer->addChild(cell);
-                    scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
-                } else if (tpObject["gdVersion"].as_string() == "2.204" && (Loader::get()->getGameVersion() == "2.204" || Loader::get()->getGameVersion() == "2.205")) {
-                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
-
-                    auto cell = TexturePackCell::create(tp, thing);
-                    tps.push_back(tp);
-                    cell->setPositionY(basePosY);
-                    scroll->m_contentLayer->addChild(cell);
-                    scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
+                if (tpObject["packFeature"].asInt().unwrap() == 1) {
+                    featured = true;
+                } else {
+                    featured = false;
                 }
-            } else {
-                TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
+                
+                thing = !thing;
 
-                auto cell = TexturePackCell::create(tp, thing);
-                tps.push_back(tp);
-                cell->setPositionY(basePosY);
-                scroll->m_contentLayer->addChild(cell);
-                scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
-            }     
-    
-            float height = std::max<float>(scroll->getContentSize().height, 35 * scroll->m_contentLayer->getChildrenCount());
-            scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
-            CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
-            int i = 0;
-    
-            for (auto* obj : objects) {
-                i++;
-                obj->setPositionY(height - (35 * i));
-    
-            }
-    
-            scroll->moveToTop();
+                tpCount += 1;
+
+                if (boobs::versionFilter) {
+                    if (tpObject["gdVersion"].asString().unwrap() == Loader::get()->getGameVersion() || tpObject["gdVersion"].asString().unwrap() == "Any") {
+                        TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
+
+                        auto cell = TexturePackCell::create(tp, thing);
+                        tps.push_back(tp);
+                        cell->setPositionY(basePosY);
+                        scroll->m_contentLayer->addChild(cell);
+                        scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
+                    } else if (tpObject["gdVersion"].asString().unwrap() == "2.204" && (Loader::get()->getGameVersion() == "2.204" || Loader::get()->getGameVersion() == "2.205")) {
+                        TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
+
+                        auto cell = TexturePackCell::create(tp, thing);
+                        tps.push_back(tp);
+                        cell->setPositionY(basePosY);
+                        scroll->m_contentLayer->addChild(cell);
+                        scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
+                    }
+                } else {
+                    TexturePack* tp = TexturePack::create(tpName, tpCreator, tpDownloadURL, tpIcon, tpDownloadVersion, tpDesc, gdVersion, featured, downloads);
+
+                    auto cell = TexturePackCell::create(tp, thing);
+                    tps.push_back(tp);
+                    cell->setPositionY(basePosY);
+                    scroll->m_contentLayer->addChild(cell);
+                    scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
+                }     
+        
+                float height = std::max<float>(scroll->getContentSize().height, 35 * scroll->m_contentLayer->getChildrenCount());
+                scroll->m_contentLayer->setContentSize(ccp(scroll->m_contentLayer->getContentSize().width, height));
+                CCArrayExt<TexturePackCell*> objects = scroll->m_contentLayer->getChildren();
+                int i = 0;
+        
+                for (auto* obj : objects) {
+                    i++;
+                    obj->setPositionY(height - (35 * i));
+        
+                }
+        
+                scroll->moveToTop();
+            } 
+
+            std::string countThing = fmt::format("{} Texture Packs", tps.size());
+
+            tpAmount = CCLabelBMFont::create(
+                countThing.c_str(),
+                "goldFont.fnt"
+            );
+            tpAmount->setID("texture-pack-count-label");
+            this->addChild(tpAmount);
+            tpAmount->setPosition(winSize / 2);
+            tpAmount->setScale(0.475);
+            tpAmount->setAnchorPoint(ccp(0.5, 1));
+            tpAmount->setPositionY(director->getScreenBottom() + 13);
+            tpAmount->setZOrder(5);
+            refreshButton->setVisible(true);
+            
+        }
+        else {
+            log::error("erm... awkward!");
         }
 
-        std::string countThing = fmt::format("{} Texture Packs", tps.size());
-
-        tpAmount = CCLabelBMFont::create(
-            countThing.c_str(),
-            "goldFont.fnt"
-        );
-        tpAmount->setID("texture-pack-count-label");
-        this->addChild(tpAmount);
-        tpAmount->setPosition(winSize / 2);
-        tpAmount->setScale(0.475);
-        tpAmount->setAnchorPoint(ccp(0.5, 1));
-        tpAmount->setPositionY(director->getScreenBottom() + 13);
-        tpAmount->setZOrder(5);
-        refreshButton->setVisible(true);
-        
-    }
-
     loading->setVisible(!boobs::downloaded);
-}
+} 
 
 void TextureWorkshopLayer::textChanged(CCTextInputNode* p0){
     searchTPs();
