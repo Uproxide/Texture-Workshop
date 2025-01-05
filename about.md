@@ -8,7 +8,7 @@ Downloads the texture pack's zip directly to Texture Loader's packs folder! No n
 ## How do I submit a texture pack?
 Easy!
 Join the [Uproxide's Little Land](https://discord.gg/pUGPY9hQ22) Discord server,
-go to the **Texture Packs Forum channel** and **read FAQ**, then create a post with the following information:
+go to the **#texture-packs forum channel** and **read FAQ**, then create a post with the following information:
 - Name of Texture Pack
 - Creator
 - Version
