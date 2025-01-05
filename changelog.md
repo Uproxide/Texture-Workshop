@@ -1,3 +1,6 @@
+# 1.3.6
+- Fixed up the mod's description
+
 # 1.3.5
 - Ported to 2.207
 
