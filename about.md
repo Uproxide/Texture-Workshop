@@ -12,7 +12,7 @@ go to the **#texture-packs forum channel** and **read FAQ**, then create a post 
 - Name of Texture Pack
 - Creator
 - Version
-- Download URL
+- Download URL (GitHub or direct download)
 - Icon
 - Description
 - Resolutions
