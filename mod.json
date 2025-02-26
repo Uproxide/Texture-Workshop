@@ -1,5 +1,5 @@
 {
-	"geode": "4.0.0-beta.1",
+	"geode": "4.2.0",
 	"gd": {
 		"win": "2.2074",
 		"android": "2.2074",
@@ -20,18 +20,13 @@
 			"resources/*.png"
 		]
 	},
-	"dependencies": [
-		{
-			"id": "geode.texture-loader",
-            "version": ">=1.6.0",
-            "importance": "required"
-		},
-		{
-			"id": "alphalaneous.happy_textures",
-			"version": ">=1.3.17",
-			"importance": "recommended"
+	"dependencies": {
+		"geode.texture-loader": ">=1.6.0",
+		"alphalaneous.happy_textures": {
+			"importance": "recommended",
+			"version": ">=1.3.17"
 		}
-	],
+	},
 	"settings": {
 		"cert-verification": {
 			"name": "Cert Verification",
