@@ -173,8 +173,8 @@ bool TextureWorkshopLayer::init() {
     auto inputNode = inp->getInputNode();
     inputNode->setPositionY(inputNode->getPositionY() - 5);
     inputNode->setPositionX(5);
-    inputNode->m_placeholderLabel->setAnchorPoint(ccp(0, 0.5));
-    inputNode->m_placeholderLabel->setScale(0.5);
+    inputNode->m_textLabel->setAnchorPoint(ccp(0, 0.5));
+    inputNode->m_textLabel->setScale(0.5);
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
 
