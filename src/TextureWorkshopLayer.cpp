@@ -318,13 +318,19 @@ void TextureWorkshopLayer::getTexturePacks() {
         auto req = web::WebRequest();
         // req.userAgent(fmt::format("TextureWorkshopMod/{}", "1.3.3"));
         req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
-        
-        m_listener.setFilter(req.get("http://textureworkshop.plusgdps.dev/api/v1/tws/getTPs"));
+
+        std::string baseURL = Mod::get()->getSettingValue<std::string>("server-link");
+        if (!baseURL.empty() && baseURL.back() == '/') {
+            baseURL.pop_back();
+        }
+        std::string fullURL = baseURL + "/api/v1/tws/getTPs";
+
+        m_listener.setFilter(req.get(fullURL));
 
     } else {
         onGetTPsFinished();
     }
-    
+
 }
 
 void TextureWorkshopLayer::parseJson(std::string str) {
