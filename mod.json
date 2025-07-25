@@ -1,12 +1,12 @@
 {
-	"geode": "4.4.0",
+	"geode": "4.6.3",
 	"gd": {
 		"win": "2.2074",
 		"mac": "2.2074",
 		"ios": "2.2074",
 		"android": "2.2074"
 	},
-	"version": "v1.3.5",
+	"version": "v1.3.6",
 	"id": "uproxide.textures",
 	"name": "Texture Workshop",
 	"developer": "Uproxide",
@@ -34,6 +34,12 @@
 			"description": "Enable Cert Verification",
 			"type": "bool",
 			"default": true
+		},
+		"server-link": {
+			"name": "Server Link",
+			"description": "Link TPs server",
+			"type": "string",
+			"default": "http://textureworkshop.plusgdps.dev"
 		}
 	},
 	"tags": [
