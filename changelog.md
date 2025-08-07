@@ -1,3 +1,8 @@
+# 1.3.6
+- MacOS Support
+- iOS Support
+(This update wouldn't be possible without hiimjasmine000 and Erymanthus contributions, Thank You!)
+
 # 1.3.5
 - Ported to 2.207
 
