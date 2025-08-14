@@ -1,3 +1,6 @@
+# 1.3.7
+- iOS JIT-Less Support
+
 # 1.3.6
 - MacOS Support
 - iOS Support
