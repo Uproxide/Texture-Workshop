@@ -1,3 +1,7 @@
+# 1.4.0
+- New API Endpoint (https://tws.m336.dev)
+### !! IF YOU USE TWS, PLEASE UPDATE TO THIS VERSION !!
+
 # 1.3.6
 - MacOS Support
 - iOS Support
