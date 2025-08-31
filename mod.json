@@ -1,12 +1,12 @@
 {
-	"geode": "4.4.0",
+	"geode": "4.8.0",
 	"gd": {
 		"win": "2.2074",
 		"mac": "2.2074",
 		"ios": "2.2074",
 		"android": "2.2074"
 	},
-	"version": "v1.3.6",
+	"version": "v1.3.7",
 	"id": "uproxide.textures",
 	"name": "Texture Workshop",
 	"developer": "Uproxide",
@@ -41,7 +41,6 @@
 	],
 	"links": {
 		"community": "https://discord.gg/uproxide-s-little-land-1204580412299542608",
-		"homepage": "https://uproxide.xyz",
 		"source": "https://github.com/Uproxide/Texture-Workshop"
 	}
 }
