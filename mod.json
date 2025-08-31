@@ -6,11 +6,11 @@
 		"ios": "2.2074",
 		"android": "2.2074"
 	},
-	"version": "v1.4.0",
+	"version": "v1.4.1",
 	"id": "uproxide.textures",
 	"name": "Texture Workshop",
 	"developer": "Uproxide",
-	"description": "An Index for Texture Packs :)",
+	"description": "An index for texture packs :)",
 	"resources": {
 		"spritesheets": {
 			"TWSSheet": [
@@ -22,10 +22,10 @@
 		]
 	},
 	"dependencies": {
-		"geode.texture-loader": ">=1.6.0",
+		"geode.texture-loader": ">=1.8.2",
 		"alphalaneous.happy_textures": {
 			"importance": "recommended",
-			"version": ">=1.3.17"
+			"version": ">=2.0.17"
 		}
 	},
 	"settings": {
