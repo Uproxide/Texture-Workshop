@@ -1,3 +1,7 @@
+# 1.4.1
+- Edited the mod's description
+- Bumped dependency versions
+
 # 1.4.0
 - New API Endpoint (https://tws.m336.dev)
 ### !! IF YOU USE TWS, PLEASE UPDATE TO THIS VERSION !!
