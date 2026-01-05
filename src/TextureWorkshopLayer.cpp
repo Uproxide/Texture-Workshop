@@ -319,7 +319,7 @@ void TextureWorkshopLayer::getTexturePacks() {
         // req.userAgent(fmt::format("TextureWorkshopMod/{}", "1.3.3"));
         req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
         
-        m_listener.setFilter(req.get("http://tws.m336.dev/api/v1/tws/getTPs"));
+        m_listener.setFilter(req.get("https://textureworkshop.xyz/api/v1/tws/getTPs"));
 
     } else {
         onGetTPsFinished();
