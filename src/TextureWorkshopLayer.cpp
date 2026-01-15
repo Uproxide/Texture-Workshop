@@ -231,7 +231,7 @@ void TextureWorkshopLayer::onFilter(CCObject*) {
 void TextureWorkshopLayer::onSupport(CCObject*) {
     geode::createQuickPopup(
         "Support Me",
-        "Making mods like this is fun, and thats thanks to you! if you want to support my shinanigans, Please support me on Patreon!",
+        "This mod tragically costs money to host and maintain cause storage is EXPENSIVE! GOD!\nHowever, if you enjoy TWS and want to support its development, consider supporting us on patreon!",
         "No Thanks", "Ok",
         [](auto, bool btn2) {
             if (btn2) {
@@ -244,7 +244,7 @@ void TextureWorkshopLayer::onSupport(CCObject*) {
 void TextureWorkshopLayer::onCredits(CCObject*) {
     FLAlertLayer::create(
         "Credits",
-        "<cg>Uproxide</c> - Main Developer\n<co>ShineUA and Alphalaneous</c> - Pull Requests :3\n<cr>TheSillyDoggo</c> - Help with Searching\n<cr>M336</c> - Server\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - Moral and Emotional Support",
+        "<cg>Uproxide</c> - Main Developer\n<co>ShineUA and Alphalaneous</c> - Pull Requests :3\n<cr>TheSillyDoggo</c> - Help with Searching\n<cr>M336</c> - Serverside Code\n<cl>Brift</c> - Sprites\n<cp>Riley</c> - she spenda the money (hosting)",
         "Ok"
     )->show();
 }
@@ -319,7 +319,7 @@ void TextureWorkshopLayer::getTexturePacks() {
         // req.userAgent(fmt::format("TextureWorkshopMod/{}", "1.3.3"));
         req.certVerification(Mod::get()->getSettingValue<bool>("cert-verification"));
         
-        m_listener.setFilter(req.get("http://tws.m336.dev/api/v1/tws/getTPs"));
+        m_listener.setFilter(req.get("https://textureworkshop.xyz/api/v1/tws/getTPs"));
 
     } else {
         onGetTPsFinished();

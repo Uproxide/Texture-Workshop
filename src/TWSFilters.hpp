@@ -15,7 +15,7 @@ using namespace geode::prelude;
 
 class TWSFilters : public Popup<> {
 public:
-    CCMenuItemToggler* versionFilter;
+    //CCMenuItemToggler* versionFilter;
     static inline TWSFilters* get = nullptr;
 
     bool setup() {
@@ -31,7 +31,7 @@ public:
         m_mainLayer->addChild(bg);
         bg->setPosition(m_mainLayer->getContentSize() / 2);
         bg->setPositionY(bg->getPositionY() - 13);
-        bg->setContentWidth(340);
+        bg->setContentWidth(110);
         bg->setContentHeight(180);
         bg->setOpacity(100);
 
@@ -40,7 +40,16 @@ public:
         bg->addChild(menu);
         menu->setPosition(0, 0);
 
-        versionFilter = CCMenuItemToggler::createWithStandardSprites(
+        //auto spr = ButtonSprite::create("Hi mom!");
+
+        //auto btn = CCMenuItemSpriteExtra::create(
+            //spr, this, nullptr
+        //);
+
+        //menu->addChild(btn);
+        //btn->setPosition(menu->getContentSize() / 2);
+
+        /*versionFilter = CCMenuItemToggler::createWithStandardSprites(
             this,
             menu_selector(TWSFilters::onToggle),
             1
@@ -53,12 +62,18 @@ public:
         versionFilter->addChild(versionFilterLabel);
         versionFilterLabel->setScale(0.6);
         versionFilterLabel->setPosition(versionFilter->getContentSize() / 2);
-        versionFilterLabel->setPositionY(versionFilterLabel->getPositionY() + 33);
+        versionFilterLabel->setPositionY(versionFilterLabel->getPositionY() + 33);*/
 
         auto lol = CCLabelBMFont::create("wait... thats all? WHAT THE fun :3", "chatFont.fnt");
         lol->setAnchorPoint(ccp(0, 0.5));
         lol->setScale(0.2);
         menu->addChild(lol);
+
+        auto uc = CCLabelBMFont::create("Under Construction", "bigFont.fnt");
+        uc->setAnchorPoint(ccp(0.5, 0.5));
+        uc->setScale(0.275);
+        menu->addChild(uc);
+        uc->setPosition(menu->getContentSize().width / 2, menu->getContentSize().height / 2);
 
         return true;
     }
@@ -77,7 +92,7 @@ public:
 
     static TWSFilters* create() {
         auto ret = new TWSFilters();
-        if (ret && ret->initAnchored(380, 230, "TWS_Box.png"_spr)) {
+        if (ret && ret->initAnchored(140, 230, "TWS_Box.png"_spr)) {
             ret->autorelease();
             return ret;
         }

@@ -6,7 +6,7 @@
 		"ios": "2.2074",
 		"android": "2.2074"
 	},
-	"version": "v1.4.1",
+	"version": "v1.5.0",
 	"id": "uproxide.textures",
 	"name": "Texture Workshop",
 	"developer": "Uproxide",
@@ -22,10 +22,10 @@
 		]
 	},
 	"dependencies": {
-		"geode.texture-loader": ">=1.6.0",
+		"geode.texture-loader": ">=1.8.1",
 		"alphalaneous.happy_textures": {
 			"importance": "recommended",
-			"version": ">=2.0.0"
+			"version": ">=2.0.22"
 		}
 	},
 	"settings": {
