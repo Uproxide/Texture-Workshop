@@ -1,5 +1,7 @@
 # 1.5.0
 - New API Endpoint again (https://textureworkshop.xyz/)
+- Edited the mod's description
+- Bumped dependency versions
 ### !! IF YOU USE TWS, PLEASE UPDATE TO THIS VERSION !!
 Huge thanks to M336 for being our host until this update, it means alot to us. Without you, TWS wouldn't be what it is today. Thank you, M336 <3
 
