@@ -1,3 +1,6 @@
+# 2.0.2
+- what in the world?
+
 # 2.0.1
 - Small bugfix with pages and searching (thanks for reporting this, tgjane! :D)
 
