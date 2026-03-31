@@ -250,8 +250,11 @@ bool TWSLayer::init() {
             "lastUpdated": 1755111695474
         }
     })").unwrap();*/
+    boobs::search = "";
+    boobs::page = 1;
 
     getTexturePacks(boobs::search); // web web web sahur
+    getTexturePacksCount(boobs::search); // web web web sahur the 2
 
     inp = TextInput::create(300, "Search", "bigFont.fnt");
     inp->setContentHeight(20);
@@ -297,11 +300,12 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
     if (scroll && scroll->m_contentLayer->getChildrenCount() > 0) scroll->m_contentLayer->removeAllChildren();
 
     if (pageCount) {
-        pageCount->removeFromParentAndCleanup(true);
-        pageCount = nullptr;
+        pageCount->setVisible(false);
     }
 
     if (loading) loading->setVisible(true);
+
+    //if (pagesMenu) pagesMenu->setVisible(false);
 
     if (auto errorSlop = outline->getChildByID("error-text"_spr)) {
         outline->removeChild(errorSlop, true);
@@ -311,37 +315,31 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
     //if (prevPage && prevPage->isVisible()) prevPage->setVisible(false);
     
     auto req = geode::utils::web::WebRequest();
-    auto req2 = geode::utils::web::WebRequest();
 
     req.onProgress([](geode::utils::web::WebProgress const& progress) {
         //log::debug("Progress: ", progress.downloadProgress());
     });
 
-    log::info("{}", boobs::page);
+    //log::info("{}", boobs::page);
 
     std::string url = fmt::format("https://textureworkshop.xyz/api/v2/tws/getTPs?page={}", boobs::page);
-    std::string pageCountUrl = fmt::format("https://textureworkshop.xyz/api/v1/tws/getTPsCount?page={}", boobs::page);
 
     if (Mod::get()->getSettingValue<bool>("version-filter")) {
         std::string currentUrlStr = url;
-        std::string currentPageUrlStr = pageCountUrl;
         url = fmt::format("{}&version={}", currentUrlStr, Loader::get()->getGameVersion());
-        pageCountUrl = fmt::format("{}&version={}", currentPageUrlStr, Loader::get()->getGameVersion());
     }
 
     if (!searchQuery.empty()) {
         std::string currentUrlStr = url;
-        std::string currentPageUrlStr = pageCountUrl;
         size_t pos = 0;
         while ((pos = searchQuery.find(" ", pos)) != std::string::npos) {
             searchQuery.replace(pos, 1, "%20");
             pos += 3;
         }
         url = fmt::format("{}&search={}", currentUrlStr, searchQuery);
-        pageCountUrl = fmt::format("{}&version={}", currentPageUrlStr, Loader::get()->getGameVersion());
     }
 
-    log::info("{}", Loader::get()->getGameVersion());
+    //log::info("{}", Loader::get()->getGameVersion());
 
     m_getTPslistener.spawn( 
         req.get(url),
@@ -375,6 +373,27 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
             }
         }
     );
+}
+
+void TWSLayer::getTexturePacksCount(std::string searchQuery) {
+    log::info("Getting TP count for page {} with search query '{}'", boobs::page, searchQuery);
+    auto req2 = geode::utils::web::WebRequest();
+    std::string pageCountUrl = fmt::format("https://textureworkshop.xyz/api/v1/tws/getTPsCount?page={}", boobs::page);
+
+    if (Mod::get()->getSettingValue<bool>("version-filter")) {
+        std::string currentPageUrlStr = pageCountUrl;
+        pageCountUrl = fmt::format("{}&version={}", currentPageUrlStr, Loader::get()->getGameVersion());
+    }
+
+    if (!searchQuery.empty()) {
+        std::string currentPageUrlStr = pageCountUrl;
+        size_t pos = 0;
+        while ((pos = searchQuery.find(" ", pos)) != std::string::npos) {
+            searchQuery.replace(pos, 1, "%20");
+            pos += 3;
+        }
+        pageCountUrl = fmt::format("{}&search={}", currentPageUrlStr, searchQuery);
+    }
 
     m_getTPsCountlistener.spawn( 
         req2.get(pageCountUrl),
@@ -388,19 +407,32 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                     return;
                 }
 
+                if (res.json().unwrap()["pageCount"].asInt().unwrap() < boobs::page) {
+                    boobs::page = res.json().unwrap()["pageCount"].asInt().unwrap();
+                    getTexturePacks(boobs::search);
+                    nextPage->setVisible(false);
+                }
+
                 auto director = CCDirector::sharedDirector();
                 std::string formattedText = fmt::format("Page {}/{} ({} Total)", boobs::page, res.json().unwrap()["pageCount"].asInt().unwrap(), res.json().unwrap()["count"].asInt().unwrap()).c_str();
-                pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
-                this->addChild(pageCount);
-                pageCount->setScale(0.3);
-                pageCount->setAnchorPoint({1, 1});
-                pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+                if (pageCount) {
+                    pageCount->setString(formattedText.c_str());
+                    pageCount->setVisible(true);
+                } else {
+                    pageCount = CCLabelBMFont::create(formattedText.c_str(), "goldFont.fnt");
+                    this->addChild(pageCount);
+                    pageCount->setScale(0.3);
+                    pageCount->setAnchorPoint({1, 1});
+                    pageCount->setPosition(ccp(director->getScreenRight() - 2, director->getScreenTop() - 2));
+                }
+                
             }
         }
     );
 }
 
 void TWSLayer::setupTPCells() {
+    if (pagesMenu) pagesMenu->setVisible(true);
     int i = 0;
     scroll->m_contentLayer->setAnchorPoint(ccp(0,1));
 
@@ -518,11 +550,13 @@ void TWSLayer::onPrevPage(CCObject*) {
 
     boobs::page -= 1;
     getTexturePacks(boobs::search);
+    getTexturePacksCount(boobs::search);
 }
 
 void TWSLayer::onNextPage(CCObject*) {
     boobs::page += 1;
     getTexturePacks(boobs::search);
+    getTexturePacksCount(boobs::search);
 }
 
 void TWSLayer::onSort(CCObject*) {
@@ -534,6 +568,7 @@ void TWSLayer::onSearch(CCObject*) {
     boobs::search = inp->getString();
     boobs::page = 1;
     getTexturePacks(boobs::search);
+    getTexturePacksCount(boobs::search);
 }
 
 void TWSLayer::keyBackClicked() {
@@ -549,11 +584,13 @@ void TWSLayer::textChanged(CCTextInputNode*) {
 
 void TWSLayer::doThingIdrk(float) {
     getTexturePacks(boobs::search);
+    getTexturePacksCount(boobs::search);
 }
 
 TWSLayer::~TWSLayer()
 {
-    boobs::search = "";
+    //boobs::search = "";
+    boobs::page = 1;
     get = nullptr;
 }
 

@@ -1,3 +1,6 @@
+# 2.0.1
+- Small bugfix with pages and searching (thanks for reporting this, tgjane! :D)
+
 # 2.0.0
 - Full Rewrite of the Mod
  ## Additions

@@ -58,6 +58,7 @@ public:
     void keyBackClicked();
 
     void getTexturePacks(std::string searchQuery);
+    void getTexturePacksCount(std::string searchQuery);
     void setupTPCells();
 
     void onDiscord(CCObject*);
