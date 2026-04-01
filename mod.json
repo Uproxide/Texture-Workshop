@@ -6,11 +6,11 @@
 		"ios": "2.2081",
 		"android": "2.2081"
 	},
-	"version": "v2.0.0",
+	"version": "v2.0.3",
 	"id": "uproxide.textures",
-	"name": "Favorite Mods",
+	"name": "Texture Workshop",
 	"developer": "Uproxide",
-	"description": "An index for Favorite Mods :)",
+	"description": "An index for Texture Packs :)",
 	"resources": {
 		"spritesheets": {
 			"TWSSheet": [

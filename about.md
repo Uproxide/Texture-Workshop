@@ -1,15 +1,15 @@
-# Favorite Mods
+# Texture Workshop
 
-A **Favorite Mod** index for [Favorite Mods](mod:cheeseworks.favoritemods)!
+A **Texture Pack** index for [Texture Loader](mod:geode.texture-loader)!
 
 ## How it works
-Downloads the Favorite Mod's zip directly to Favorite Loaders's Mods folder! No need to unzip!
+Downloads the texture pack's zip directly to Texture Loader's packs folder! No need to unzip!
 
-## How do I submit a Favorite Mod?
+## How do I submit a Texture Pack?
 Easy!
 Join the [Uproxide's Little Land](https://discord.gg/pUGPY9hQ22) Discord server,
-go to the **#Favorite-Mods forum channel** and **read FAQ**, then create a post with the following information:
-- Name of Favorite Mod
+go to the **#texture-packs forum channel** and **read FAQ**, then create a post with the following information:
+- Name of Texture Pack
 - Creator
 - Version
 - Download URL (GitHub or direct download)
@@ -18,15 +18,14 @@ go to the **#Favorite-Mods forum channel** and **read FAQ**, then create a post 
 - Resolutions (Low, Med, High)
 - Game Version
 
-And that's about it! Wait until a **Favorite Mod Mod** reviews your Favorite Mod, and if they approve, it will be added!
-
-## Where are my Favorite Mods?
-Ask Cheeseworks. Don't ask me! I forgort.
+And that's about it! Wait until a **Texture Pack Mod** reviews your texture pack, and if they approve, it will be added!
 
 ## Credits
 - Uproxide (Code and everything else)
 - M336 (Server)
-- Alphalaneous, M336, TheSillyDoggo, ShineUA (Their PRs to FM)
+- Alphalaneous, M336, TheSillyDoggo, ShineUA (Their PRs to TWS)
 - Riley (Emotional support)
 - Brift (Concept creator, sprites, and logo)
-- Jaid (Helped with the about.md || One of the main FM Mods)
+- Dremsk1y_ (Sprites)
+- Jaid (Helped with the about.md || One of the main TP Mods)
+- Cheeseworks (john)
