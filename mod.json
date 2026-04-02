@@ -1,12 +1,12 @@
 {
-	"geode": "5.4.1",
+	"geode": "5.5.3",
 	"gd": {
 		"win": "2.2081",
 		"mac": "2.2081",
 		"ios": "2.2081",
 		"android": "2.2081"
 	},
-	"version": "v2.0.3",
+	"version": "v2.0.4",
 	"id": "uproxide.textures",
 	"name": "Texture Workshop",
 	"developer": "Uproxide",

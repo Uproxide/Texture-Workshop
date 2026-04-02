@@ -1,5 +1,6 @@
-# 2.0.3
+# 2.0.4
 - cheeseworks has been die
+- replace patreon with ko-fi
 
 # 2.0.2
 - what in the world?

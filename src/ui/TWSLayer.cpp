@@ -516,11 +516,11 @@ void TWSLayer::onDiscord(CCObject*) {
 void TWSLayer::onSupport(CCObject*) {
     geode::createQuickPopup(
         "Support Me",
-        "This mod tragically costs money to host and maintain cause storage is EXPENSIVE! GOD!\nHowever, if you enjoy TWS and want to support its development, consider supporting us on patreon for some cool perks!",
+        "This mod tragically costs money to host and maintain cause storage is EXPENSIVE! GOD!\nHowever, if you enjoy TWS and want to support its development, consider supporting us on ko-fi for some cool perks!",
         "No Thanks", "Ok",
         [](auto, bool btn2) {
             if (btn2) {
-                utils::web::openLinkInBrowser("https://patreon.com/uproxide");
+                utils::web::openLinkInBrowser("https://ko-fi.com/teamsillywillies");
             }
         }
     );
