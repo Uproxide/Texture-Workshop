@@ -22,10 +22,10 @@ And that's about it! Wait until a **Texture Pack Mod** reviews your texture pack
 
 ## Credits
 - [Uproxide](user:25397826) (Code and everything else)
-- M336 (Server)
-- Alphalaneous, M336, TheSillyDoggo, ShineUA (Their PRs to TWS)
+- [M336](user:24710147) (Server Code)
+- [Alphalaneous](user:1139015), [M336](user:24710147), [TheSillyDoggo](user:16778880), ShineUA (Their PRs to TWS)
 - Riley (Emotional support)
-- Brift (Concept creator, sprites, and logo)
-- Dremsk1y_ (Sprites)
-- Jaid (Helped with the about.md || One of the main TP Mods)
-- Cheeseworks (john)
+- [Brift](user:14114548) (Concept creator, sprites, and logo)
+- [Dremsk1y](user:31005689)
+- [Jaid](user:7669473) (Helped with the about.md || One of the main TP Mods)
+- [Cheeseworks](user:6408873) (john)

@@ -19,7 +19,7 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
         this->setOpacity(50); 
     }
 
-    this->setContentSize(ccp(315, 35));
+    this->setContentSize(ccp(159, 35));
     this->setAnchorPoint(ccp(0, 1));
 
     float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
@@ -42,7 +42,7 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
 
             if (texturePack->featured) {
                 auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
-                featuredSpr->setScale(0.35);
+                featuredSpr->setScale(0.325);
                 featuredSpr->setPosition({ 18, this->getContentSize().height / 2 });
                 this->addChild(featuredSpr);
             }
@@ -50,28 +50,29 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     );
     this->addChild(icon);
     icon->loadFromUrl(tp->IconURL, geode::LazySprite::Format::kFmtPng);
-    icon->setScale(0.35 * scale);
+    icon->setScale(0.325 * scale);
     icon->setPosition({ 18, this->getContentSize().height / 2 });
     icon->setZOrder(1);
 
     // name setup yay
     nameLabel = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
-    nameLabel->setScale(0.4);
+    nameLabel->setScale(0.375);
     nameLabel->setAnchorPoint(ccp(0, 0.5f));
-    nameLabel->setPosition({35.5, 26.5}); // OH BOY I LOVE HARDCODING!
+    nameLabel->setPosition({33.5, 26.5}); // OH BOY I LOVE HARDCODING!
     nameLabel->setZOrder(1);
+    nameLabel->limitLabelWidth(90, 0.375, 0.1);
     this->addChild(nameLabel);
 
     versionLabel = CCLabelBMFont::create(fmt::format("v{}", tp->TPVersion).c_str(), "bigFont.fnt");
-    versionLabel->setScale(0.2);
+    versionLabel->setScale(0.175);
     versionLabel->setAnchorPoint(ccp(0, 1));
-    versionLabel->setPosition({35.5, 12}); // OH BOY I LOVE HARDCODING!
+    versionLabel->setPosition({33.5, 12}); // OH BOY I LOVE HARDCODING!
     versionLabel->setColor({51, 153, 255});
     versionLabel->setZOrder(1);
     this->addChild(versionLabel);
 
     downloadCount = CCLabelBMFont::create(fmt::format("{}", tp->downloads).c_str(), "bigFont.fnt");
-    downloadCount->setScale(0.2);
+    downloadCount->setScale(0.175);
     downloadCount->setAnchorPoint(ccp(0, 1));
     downloadCount->setPosition(ccp(versionLabel->getPosition().x + versionLabel->getScaledContentWidth() + 8, 12)); // OH BOY I LOVE HARDCODING! kinda? wat?
     downloadCount->setColor({0, 255, 33});
@@ -79,7 +80,7 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     this->addChild(downloadCount);
 
     auto downloadIcons = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
-    downloadIcons->setScale(0.25);
+    downloadIcons->setScale(0.225);
     downloadIcons->setAnchorPoint(ccp(1, 1));
     downloadIcons->setPosition(ccp(downloadCount->getPosition().x - .3f, 11));
     downloadIcons->setZOrder(1);
@@ -90,9 +91,10 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
         "goldFont.fnt"
     );
     texturePackCreator->setScale(0.3);
-    texturePackCreator->setPosition({35.5, 16.5});
+    texturePackCreator->setPosition({33.5, 16.5});
     texturePackCreator->setAnchorPoint(ccp(0, 0.5f));
     texturePackCreator->setZOrder(1);
+    texturePackCreator->limitLabelWidth(100, 0.3, 0.1);
     this->addChild(texturePackCreator);
 
     auto buttonMenu = CCMenu::create();
@@ -101,7 +103,7 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     buttonMenu->setPosition(0,0);
 
     auto tpInfoSpr = CCSprite::createWithSpriteFrameName("TWS_InfoButton.png"_spr);
-    tpInfoSpr->setScale(.2);
+    tpInfoSpr->setScale(.175);
     auto tpInfoPage = CCMenuItemSpriteExtra::create(
         tpInfoSpr,
         this,
@@ -113,30 +115,30 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
     tpInfoPage->setPosition(ccp(nameLabel->getPosition().x + nameLabel->getScaledContentWidth() + 6, 25.5));
 
     auto tpDownloadSpr = CCSprite::createWithSpriteFrameName("TWS_DownloadButton.png"_spr);
-    tpDownloadSpr->setScale(.65);
+    tpDownloadSpr->setScale(.425);
     tpDownload = CCMenuItemSpriteExtra::create(
         tpDownloadSpr,
         this,
         menu_selector(TWSPackCell::onDownload)
     );
     buttonMenu->addChild(tpDownload);
-    tpDownload->setPosition({ 288, this->getContentHeight() / 2 });
+    tpDownload->setPosition({ 148, 11 });
 
     auto tpDeleteSpr = CCSprite::createWithSpriteFrameName("TWS_DeleteButton.png"_spr);
-    tpDeleteSpr->setScale(.65);
+    tpDeleteSpr->setScale(.425);
     tpDelete = CCMenuItemSpriteExtra::create(
         tpDeleteSpr,
         this,
         menu_selector(TWSPackCell::onDelete)
     );
     buttonMenu->addChild(tpDelete);
-    tpDelete->setPosition({ 288, this->getContentHeight() / 2 });
+    tpDelete->setPosition({ 148, 11 });
     tpDelete->setVisible(false);
 
     texturePack->downloadingIndicator = Slider::create(this, nullptr);
     this->addChild(texturePack->downloadingIndicator);
     texturePack->downloadingIndicator->m_groove->setPosition(tpDownload->getPosition());
-    texturePack->downloadingIndicator->m_groove->setScale(0.575);
+    texturePack->downloadingIndicator->m_groove->setScale(0.25);
     texturePack->downloadingIndicator->m_groove->setAnchorPoint({1, 0.5});
     texturePack->downloadingIndicator->m_touchLogic->setVisible(false);
 

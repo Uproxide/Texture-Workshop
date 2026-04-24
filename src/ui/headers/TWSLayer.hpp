@@ -7,6 +7,7 @@ using namespace geode::prelude;
 #include <Geode/utils/async.hpp>
 
 #include "../../tps/headers/TWSPack.hpp"
+#include "../../ui/headers/TWSPackInfo.hpp"
 
 class TWSLayer : public cocos2d::CCLayer, TextInputDelegate {
 protected:
@@ -17,9 +18,15 @@ protected:
     ScrollLayer* scroll = nullptr;
 
     bool stupid = true;
+    bool loadingAndSetupDoneRandomTP = true;
     
     CCScale9Sprite* bg;
+
     CCSprite* outline;
+    CCSprite* selected1Spr;
+    CCSprite* selected2Spr;
+    CCSprite* selected3Spr;
+
     CCLabelBMFont* pageCount;
     
     CCMenuItemSpriteExtra* refreshButton;
@@ -27,16 +34,20 @@ protected:
     CCMenuItemSpriteExtra* prevPage;
     CCMenuItemSpriteExtra* nextPage;
     CCMenuItemSpriteExtra* sortButton;
+
     CCMenu* buttonMenu;
     std::string inputText;
     async::TaskHolder<geode::utils::web::WebResponse> m_getTPslistener;
     async::TaskHolder<geode::utils::web::WebResponse> m_getTPsCountlistener;
+    async::TaskHolder<geode::utils::web::WebResponse> m_getRandomTPListener;
     CCMenu* pagesMenu = nullptr;
     TextInput* inp;
 
     LoadingCircleSprite* loading;
 
     matjson::Value pageJson;
+
+    CCNode* randomTPNode = nullptr;
 
     //int page = 1;
 
@@ -60,6 +71,7 @@ public:
     void getTexturePacks(std::string searchQuery);
     void getTexturePacksCount(std::string searchQuery);
     void setupTPCells();
+    void setupRandomTPNode(TWSPack* tp);
 
     void onDiscord(CCObject*);
     void onSupport(CCObject*);
@@ -69,6 +81,7 @@ public:
     void onRefreshSearch(CCObject*);
     void onSearch(CCObject*);
     void onFilter(CCObject*);
+    void onRandom(CCObject*);
 
     void onSort(CCObject*);
 
