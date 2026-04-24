@@ -18,7 +18,8 @@
 			]
 		},
 		"sprites": [
-			"resources/*.png"
+			"resources/TWS_Box.png",
+			"resources/TWS_Cubes.png"
 		]
 	},
 	"dependencies": {
