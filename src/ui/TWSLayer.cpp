@@ -87,8 +87,8 @@ bool TWSLayer::init() {
     this->addChild(bg);
 
     bg->setPosition(winSize / 2);
-    bg->setContentHeight(232);
-    bg->setContentWidth(357);
+    bg->setContentHeight(252);
+    bg->setContentWidth(380);
     bg->setOpacity(135);
     bg->setPositionY(bg->getPositionY() - 15);
 
@@ -96,7 +96,7 @@ bool TWSLayer::init() {
     outline->setID("outline");
     this->addChild(outline);
     outline->setPosition(winSize / 2);
-    outline->setScale(1.15);
+    outline->setScale(1.2);
     outline->setZOrder(1);
 
     pagesMenu = CCMenu::create();
@@ -205,18 +205,18 @@ bool TWSLayer::init() {
     featuredBtn->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 25));*/
     // big yahu save me bro
 
-    scroll = ScrollLayer::create(ccp(160, 193));
+    scroll = ScrollLayer::create(ccp(313, 180));
     scroll->setAnchorPoint(ccp(0, 0));
     scroll->ignoreAnchorPointForPosition(false);
     scroll->setZOrder(-1);
-    scroll->setPosition(150, 14);
+    scroll->setPosition(8, 8);
 
     outline->addChild(scroll);
 
     loading = LoadingCircleSprite::create(1);
     loading->setID("loading");
     loading->setScale(0.6f);
-    loading->setPosition(ccp((outline->getContentWidth() / 2) + 68, outline->getContentHeight() / 2 + -16.875f));
+    loading->setPosition(ccp(outline->getContentWidth() / 2, outline->getContentHeight() / 2 + -21.875f));
     outline->addChild(loading);
     loading->setVisible(false);
 
@@ -256,13 +256,13 @@ bool TWSLayer::init() {
     getTexturePacks(boobs::search); // web web web sahur
     getTexturePacksCount(boobs::search); // web web web sahur the 2
 
-    inp = TextInput::create(110, "Search", "bigFont.fnt");
+    inp = TextInput::create(300, "Search", "bigFont.fnt");
     inp->setContentHeight(20);
     inp->setAnchorPoint(ccp(0, 0));
     inp->ignoreAnchorPointForPosition(false); 
     this->outline->addChild(inp);
 
-    inp->setPosition(ccp(18.5, 176.2));
+    inp->setPosition(ccp(6, 194.2));
     inp->hideBG();
     auto inputNode = inp->getInputNode();
     inputNode->setPositionY(inputNode->getPositionY() - 5);
@@ -271,93 +271,6 @@ bool TWSLayer::init() {
     inputNode->m_textLabel->setScale(0.5);
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
-
-    auto filterMenu = CCMenu::create();
-    filterMenu->setPosition(0, 0);
-    outline->addChild(filterMenu, 1);
-    filterMenu->setID("filter-menu");
-    filterMenu->ignoreAnchorPointForPosition(false);
-    filterMenu->setPosition({78, 110});
-    filterMenu->setContentSize({131, 180});
-
-    auto button1Spr = CCSprite::createWithSpriteFrameName("TWS_ButtonSmall.png"_spr);
-    selected1Spr = CCSprite::createWithSpriteFrameName("TWS_ButtonSmallOutline.png"_spr);
-    auto featuredSpr = CCSprite::createWithSpriteFrameName("GJ_starsIcon_001.png");
-    button1Spr->addChild(featuredSpr);
-    featuredSpr->setPosition(ccp(button1Spr->getContentSize().width / 2, button1Spr->getContentSize().height / 2));
-    auto featuredBtn = CCMenuItemSpriteExtra::create(
-        button1Spr,
-        this,
-        menu_selector(TWSLayer::onFilter)
-    );
-    featuredBtn->setTag(92210);
-    filterMenu->addChild(featuredBtn);
-    filterMenu->addChild(selected1Spr);
-    featuredBtn->setPosition({24, 131});
-    featuredBtn->setZOrder(1);
-    selected1Spr->setPosition({24, 131});
-    selected1Spr->setScale(1.025);
-    selected1Spr->setVisible(false);
-
-    auto button2Spr = CCSprite::createWithSpriteFrameName("TWS_ButtonSmall.png"_spr);
-    selected2Spr = CCSprite::createWithSpriteFrameName("TWS_ButtonSmallOutline.png"_spr);
-    auto recentSpr = CCSprite::createWithSpriteFrameName("GJ_timeIcon_001.png");
-    button2Spr->addChild(recentSpr);
-    recentSpr->setPosition(ccp(button2Spr->getContentSize().width / 2, button2Spr->getContentSize().height / 2));
-    auto recentBtn = CCMenuItemSpriteExtra::create(
-        button2Spr,
-        this,
-        menu_selector(TWSLayer::onFilter)
-    );
-    recentBtn->setTag(92211);
-    filterMenu->addChild(recentBtn);
-    filterMenu->addChild(selected2Spr);
-    recentBtn->setPosition({65.5, 131});
-    recentBtn->setZOrder(1);
-    selected2Spr->setPosition({65.5, 131});
-    selected2Spr->setScale(1.025);
-    selected2Spr->setVisible(false);
-
-    auto button3Spr = CCSprite::createWithSpriteFrameName("TWS_ButtonSmall.png"_spr);
-    selected3Spr = CCSprite::createWithSpriteFrameName("TWS_ButtonSmallOutline.png"_spr);
-    auto downloadsSpr = CCSprite::createWithSpriteFrameName("GJ_downloadsIcon_001.png");
-    button3Spr->addChild(downloadsSpr);
-    downloadsSpr->setPosition(ccp(button3Spr->getContentSize().width / 2, button3Spr->getContentSize().height / 2));
-    auto downloadsBtn = CCMenuItemSpriteExtra::create(
-        button3Spr,
-        this,
-        menu_selector(TWSLayer::onFilter)
-    );
-    downloadsBtn->setTag(92212);
-    filterMenu->addChild(downloadsBtn);
-    filterMenu->addChild(selected3Spr);
-    downloadsBtn->setPosition({106, 131});
-    downloadsBtn->setZOrder(1);
-    selected3Spr->setPosition({106, 131});
-    selected3Spr->setScale(1.025);
-    selected3Spr->setVisible(false);
-
-    auto button4Spr = CCSprite::createWithSpriteFrameName("TWS_ButtonLong.png"_spr);
-    auto randomSpr = CCSprite::createWithSpriteFrameName("GJ_sRecentIcon_001.png");
-    auto randomLabel = CCLabelBMFont::create("Feelin' Lucky!", "goldFont.fnt");
-    button4Spr->addChild(randomSpr);
-    button4Spr->addChild(randomLabel);
-    randomSpr->setPosition(ccp(106.25, button4Spr->getContentSize().height / 2));
-    randomSpr->setScale(0.9);
-    randomLabel->setScale(0.5);
-    randomLabel->setAnchorPoint(ccp(0, 0.5f));
-    randomLabel->setPosition(ccp(6, button4Spr->getContentSize().height / 2));
-    auto randomBtn = CCMenuItemSpriteExtra::create(
-        button4Spr,
-        this,
-        menu_selector(TWSLayer::onRandom)
-    );
-    filterMenu->addChild(randomBtn);
-    randomBtn->setPosition({65, 93});
-    
-    selected1Spr->setVisible(boobs::featuredSort);
-    selected2Spr->setVisible(boobs::recentlyUpdatedSort);
-    selected3Spr->setVisible(boobs::downloadsSort);
 
     /*auto inpMenu = CCMenu::create();
     inpMenu->setContentSize(inp->getContentSize());
@@ -426,17 +339,6 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
         url = fmt::format("{}&search={}", currentUrlStr, searchQuery);
     }
 
-    if (boobs::downloadsSort) {
-        std::string currentUrlStr = url;
-        url = fmt::format("{}&sort=downloads", currentUrlStr);
-    } else if (boobs::featuredSort) {
-        std::string currentUrlStr = url;
-        url = fmt::format("{}&sort=featured", currentUrlStr);
-    } else if (boobs::recentlyUpdatedSort) {
-        std::string currentUrlStr = url;
-        url = fmt::format("{}&sort=recent", currentUrlStr);
-    }
-
     //log::info("{}", Loader::get()->getGameVersion());
 
     m_getTPslistener.spawn( 
@@ -448,10 +350,9 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                 if (res.string().unwrap() == "{}") {
                     auto errorText = CCLabelBMFont::create("No texture packs found!", "bigFont.fnt");
                     outline->addChild(errorText);
-                    errorText->setScale(0.2);
+                    errorText->setScale(0.3);
                     errorText->setID("error-text"_spr);
-                    errorText->setPosition({ 225.5, 201.375 });
-                    errorText->setAnchorPoint({ 0.5, 1 });
+                    errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
                     loading->setVisible(false);
                     nextPage->setVisible(false);
                     prevPage->setVisible(false);
@@ -461,12 +362,11 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                     setupTPCells();
                 }
             } else {
-                auto errorText = CCLabelBMFont::create(fmt::format("Something went wrong while getting TPs!\nPlease try again later.\n\nError Code: {}", res.code()).c_str(), "bigFont.fnt");
+                auto errorText = CCLabelBMFont::create("Something went wrong while getting TPs!\nPlease try again later.", "bigFont.fnt");
                 outline->addChild(errorText);
-                errorText->setScale(0.2);
+                errorText->setScale(0.3);
                 errorText->setID("error-text"_spr);
-                errorText->setPosition({ 225.5, 201.375 });
-                errorText->setAnchorPoint({ 0.5, 1 });
+                errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
                 loading->setVisible(false);
                 nextPage->setVisible(false);
                 prevPage->setVisible(false);
@@ -493,11 +393,6 @@ void TWSLayer::getTexturePacksCount(std::string searchQuery) {
             pos += 3;
         }
         pageCountUrl = fmt::format("{}&search={}", currentPageUrlStr, searchQuery);
-    }
-
-    if (boobs::featuredSort) {
-        std::string currentPageUrlStr = pageCountUrl;
-        pageCountUrl = fmt::format("{}&featured=1", currentPageUrlStr);
     }
 
     m_getTPsCountlistener.spawn( 
@@ -535,161 +430,6 @@ void TWSLayer::getTexturePacksCount(std::string searchQuery) {
         }
     );
 }
-
-void TWSLayer::onFilter(CCObject* btn) {
-    switch (btn->getTag())
-    {
-    case 92210:
-        boobs::featuredSort = !boobs::featuredSort;
-
-        boobs::downloadsSort = false;
-        boobs::recentlyUpdatedSort = false;
-
-        break;
-
-    case 92211:
-        boobs::recentlyUpdatedSort = !boobs::recentlyUpdatedSort;
-
-        boobs::downloadsSort = false;
-        boobs::featuredSort = false;
-
-        break;
-
-    case 92212:
-        boobs::downloadsSort = !boobs::downloadsSort;
-
-        boobs::featuredSort = false;
-        boobs::recentlyUpdatedSort = false;
-
-        break;
-    
-    default:
-        boobs::featuredSort = false;
-        boobs::downloadsSort = false;
-        boobs::recentlyUpdatedSort = false;
-        break;
-    }
-
-    selected1Spr->setVisible(boobs::featuredSort);
-    selected2Spr->setVisible(boobs::recentlyUpdatedSort);
-    selected3Spr->setVisible(boobs::downloadsSort);
-
-    getTexturePacks(boobs::search);
-    getTexturePacksCount(boobs::search);
-} 
-// they call me yanderedev for this button logic #fuckyes 
-// holy shit im the netanyahu of geode
-
-void TWSLayer::onRandom(CCObject*) {
-    if (!loadingAndSetupDoneRandomTP) {
-        return;
-    }
-
-    auto loadingRandom = LoadingCircleSprite::create(1);
-    loadingRandom->setID("loading-random");
-    loadingRandom->setScale(0.6f);
-    loadingRandom->setPosition(ccp(75.5, 56.5));
-    outline->addChild(loadingRandom);
-    loadingRandom->setVisible(true);
-
-    if (randomTPNode) {
-        randomTPNode->removeFromParentAndCleanup(true);
-        randomTPNode = nullptr;
-    }
-
-    loadingAndSetupDoneRandomTP = false;
-
-    auto req = geode::utils::web::WebRequest();
-    std::string randomTPURL = "https://textureworkshop.xyz/api/v1/tws/getRandomTP";
-    if (Mod::get()->getSettingValue<bool>("version-filter")) {
-        std::string currentRandomTPURL = randomTPURL;
-        currentRandomTPURL = fmt::format("{}?version={}", randomTPURL, Loader::get()->getGameVersion());
-    }
-
-    m_getRandomTPListener.spawn( 
-        req.get(randomTPURL),
-        [this, loadingRandom](geode::utils::web::WebResponse res) {
-            log::debug("Response: {}", res.code());
-            log::debug("Body: {}", res.string().unwrap());
-            if (!res.ok()) {
-                log::error("Failed to get random TP: {}", res.string().unwrap());
-                loadingAndSetupDoneRandomTP = true;
-            } else {
-                auto tpObject = res.json().unwrap();
-                bool featured = false;
-
-                if (tpObject["packFeature"].asInt().unwrap() == 1) {
-                    featured = true;
-                } else {
-                    featured = false;
-                }
-
-                TWSPack* tp = TWSPack::create(
-                    tpObject["packID"].asInt().unwrap(),
-                    tpObject["packName"].asString().unwrap(),
-                    tpObject["downloadLink"].asString().unwrap(),
-                    tpObject["packLogo"].asString().unwrap(),
-                    tpObject["packDescription"].asString().unwrap(),
-                    tpObject["packCreator"].asString().unwrap(),
-                    tpObject["packVersion"].asString().unwrap(),
-                    tpObject["gdVersion"].asString().unwrap(),
-                    featured,
-                    tpObject["packDownloads"].asInt().unwrap()
-                );
-
-                TWSPackInfo::create(tp)->show();
-                loadingAndSetupDoneRandomTP = true;
-                loadingRandom->removeFromParentAndCleanup(true);
-            }
-        }
-    );
-}
-
-/* void TWSLayer::setupRandomTPNode(TWSPack* tp) {
-    int reloadIconTries = 0;
-    float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
-
-    randomTPNode = CCNode::create();
-    outline->addChild(randomTPNode);
-
-    randomTPNode->setContentSize({121, 72});
-    randomTPNode->setAnchorPoint({0.5, 0.5});
-    randomTPNode->setPosition({76.5, 56.375});
-
-    auto tpName = CCLabelBMFont::create(tp->TPName.c_str(), "bigFont.fnt");
-    randomTPNode->addChild(tpName);
-
-    auto icon = geode::LazySprite::create({100, 100});
-    icon->setLoadCallback(
-        [this, &reloadIconTries, tp, icon](Result<> result) {
-            if (!result.isOk()) 
-            {
-                if (reloadIconTries < 3) {
-                    log::info("failed to load icon, please refresh this TWS page to try again."); 
-                    // fallback
-                    icon->initWithSpriteFrameName("TWS_Error.png"_spr);
-                } else {
-                    icon->loadFromUrl(tp->IconURL, geode::LazySprite::Format::kFmtPng);
-                    reloadIconTries += 1;
-                }
-            }
-
-            if (tp->featured) {
-                auto featuredSpr = CCSprite::createWithSpriteFrameName("TWS_Featured.png"_spr);
-                featuredSpr->setScale(0.325);
-                featuredSpr->setPosition({ 18, 56 });
-                randomTPNode->addChild(featuredSpr);
-            }
-        }
-    );
-    randomTPNode->addChild(icon);
-    icon->loadFromUrl(tp->IconURL, geode::LazySprite::Format::kFmtPng);
-    icon->setScale(0.325 * scale);
-    icon->setPosition({ 18, 56 });
-    icon->setZOrder(1);
-
-    loadingAndSetupDoneRandomTP = true;
-} */
 
 void TWSLayer::setupTPCells() {
     if (pagesMenu) pagesMenu->setVisible(true);

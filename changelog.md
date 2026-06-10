@@ -1,17 +1,11 @@
-# 2.1.0
- ## Additions
-- New UI Design! Thank you [Qeast](user:15001632) for the concept and [Dremsk1y](user:31005689) for the Sprites and Refresh!
-- Filters! You can now filter between Featured TPs, Most Downloaded TPs, and Recently Updates TPs.
-- Random Button! Feelin Lucky? Press the button to get a Random TP to try out!
-
-## 2.0.4
+# 2.0.4
 - cheeseworks has been die
 - replace patreon with ko-fi
 
-## 2.0.2
+# 2.0.2
 - what in the world?
 
-## 2.0.1
+# 2.0.1
 - Small bugfix with pages and searching (thanks for reporting this, tgjane! :D)
 
 # 2.0.0
@@ -36,12 +30,12 @@ Huge thanks to M336 for being our host until this update, it means alot to us. W
 - New API Endpoint (https://tws.m336.dev)
 ### !! IF YOU USE TWS, PLEASE UPDATE TO THIS VERSION !!
 
-## 1.3.6
+# 1.3.6
 - MacOS Support
 - iOS Support
 (This update wouldn't be possible without hiimjasmine000 and Erymanthus contributions, Thank You!)
 
-## 1.3.5
+# 1.3.5
 - Ported to 2.207
 
 # 1.3.4
@@ -56,11 +50,11 @@ Huge thanks to M336 for being our host until this update, it means alot to us. W
 - Animated Background (Thanks ShineUA and Alphalaneous!)
 - New Server (Thanks M336!)
   
-## 1.3.2
+# 1.3.2
 - Fix crash on pretty much doing anything that calls onGetTPsFinished
 - Allow icons to be a different res than 336x336
 
-## 1.3.1
+# 1.3.1
 - Fix Crash when spamming Version Filter button
 - Fix Filter Button alignment
 - Make Happy Textures recommended (as THIS MODS DEPENDENCY, TP Creators this is entirely optional)
@@ -74,10 +68,10 @@ Huge thanks to M336 for being our host until this update, it means alot to us. W
 - MacOS (if it builds)
 - Bugfixes
 
-## 1.2.0
+# 1.2.0
 - idk
 
-## 1.1.0
+# 1.1.0
 - Fix 2.206
   
 # 1.0.0
@@ -85,7 +79,7 @@ Huge thanks to M336 for being our host until this update, it means alot to us. W
 - Update Indicator for Texture Packs
 - Credits
 
-## 1.0.0 (Beta 3)
+# 1.0.0 (Beta 3)
 - Change Patreon to Ko-Fi. Thats all :)
 
 # 1.0.0 (Beta 2)
