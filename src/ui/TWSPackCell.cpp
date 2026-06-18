@@ -19,7 +19,7 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
         this->setOpacity(50); 
     }
 
-    this->setContentSize(ccp(315, 35));
+    this->setContentSize(ccp(289, 35));
     this->setAnchorPoint(ccp(0, 1));
 
     float scale = CCDirector::sharedDirector()->getContentScaleFactor()/4;
@@ -120,7 +120,7 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
         menu_selector(TWSPackCell::onDownload)
     );
     buttonMenu->addChild(tpDownload);
-    tpDownload->setPosition({ 288, this->getContentHeight() / 2 });
+    tpDownload->setPosition({ 272, this->getContentHeight() / 2 });
 
     auto tpDeleteSpr = CCSprite::createWithSpriteFrameName("TWS_DeleteButton.png"_spr);
     tpDeleteSpr->setScale(.65);
@@ -130,7 +130,7 @@ bool TWSPackCell::init(TWSPack* tp, bool other) {
         menu_selector(TWSPackCell::onDelete)
     );
     buttonMenu->addChild(tpDelete);
-    tpDelete->setPosition({ 288, this->getContentHeight() / 2 });
+    tpDelete->setPosition({ 272, this->getContentHeight() / 2 });
     tpDelete->setVisible(false);
 
     texturePack->downloadingIndicator = Slider::create(this, nullptr);

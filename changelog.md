@@ -1,3 +1,12 @@
+# 2.1.0
+ ## Additions
+- Filters
+- Creator Searching
+- New UI Design
+ ## Changes
+- Slightly changed about.md
+- Credits Page Changes
+
 # 2.0.4
 - cheeseworks has been die
 - replace patreon with ko-fi

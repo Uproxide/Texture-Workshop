@@ -1,14 +1,33 @@
-© 2024-2026 Uproxide
+TL;DR: Ask us at tsw@teamsillywillies.org for permission to distribute/host an independent fork of TWS. Don't steal our work, don't sell our work, don't make money off our work.
 
-i do not care what you do with this code minus a few things
+Texture Workshop License Agreement
 
-- If you are to make your own custom fork that is its own mod, get permission from me first! and credit me and previous contributors clearly.
-- Don't sell any version of this mod. You wouldn't steal a car and pawn it off! actually you probably would, but please don't!
-- Keep this license intact, please!
-- I have permission to take down any fork if I want to or you break these terms. Even if you sublicense! Spooky!
-- I (Uproxide) own Texture Workshop. I have the choice in what happens! Forks or anything do not transfer ownership unless I state otherwise.
+Effective Date: June 18, 2026  
+Copyright: © 2024-2026 Team Silly Willies. All rights reserved.
 
-Any fork/commit before April 7th, 2026 will retain MIT License.
-HOWEVER! If you pull this license from this repository after the date (e.g., merging into your own fork) you fall under these terms!
+1. Grant of License and Scope
+Subject to the terms and conditions of this Agreement, Team Silly Willies (collectively, "the Authors") grant you a limited, non-exclusive, non-transferable, and revocable license to view, download, compile, execute, and modify the source code of Texture Workshop solely for personal, non-commercial use. 
 
-This code is provided AS-IS.
+2. Restrictions on Distribution and Commercialization
+- Distribution Prohibitions: You may not distribute, publish, sub-license, or publicly host any portion of the Texture Workshop software, source code, compiled binaries, assets, artwork, or music on any third-party platforms (including, but not limited to, CurseForge, Modrinth, or independent hosting sites) without the express, written permission of Team Silly Willies.
+- GitHub Forking: This license permits the creation of forks exclusively within the GitHub ecosystem as required by GitHub’s Terms of Service. However, compiling these forks for public distribution or merging modified versions into external codebases remains subject to the distribution prohibitions outlined above.
+- Commercial Restrictions: You are strictly prohibited from selling, commercializing, or generating revenue from this software, its forks, or any derivative works of the software itself.
+- User-Generated Content Exception: The commercial restrictions in this Agreement apply strictly to the Texture Workshop software, its source code, and its built-in assets. They do not restrict monetization of video or media coverage demonstrating the use of the software.
+
+3. License Integrity and Ownership
+- Modification of Terms: You may not alter, remove, or obscure this license file or any copyright notices contained within the repository.
+- Retention of Ownership: Team Silly Willies retains all right, title, and interest in and to Texture Workshop. The creation of a fork, pull request, or contribution does not transfer intellectual property rights or ownership to any third party.
+
+4. Historical License Transitions and Retroactivity
+- MIT License Safe Harbor: Any fork or commit established prior to April 7, 2026, retains the rights granted under the MIT License.
+- Uproxide License Safe Harbor: Any fork or commit established between April 7, 2026, and June 17, 2026, retains the rights granted under the historical Uproxide License.
+- Retroactive Binding: If any updates, commits, or code originating from this repository after June 18, 2026, are merged, pulled, or integrated into an older fork, that fork and its maintainer automatically become bound by the full terms of this June 18, 2026 Agreement.
+
+5. Termination and Enforcement
+Any breach of these terms immediately voids your license to use or modify this software. Team Silly Willies or any legally authorized representative reserves the right to issue intellectual property takedown notices (including GitHub DMCA takedown requests) and pursue necessary remedies to remove unauthorized forks or distributions.
+
+6. Contact for Authorization
+For inquiries regarding distribution permissions, commercial licensing, or variance requests, contact the authors officially at: tsw@teamsillywillies.org
+
+7. Disclaimer of Warranty
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

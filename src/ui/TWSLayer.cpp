@@ -88,7 +88,7 @@ bool TWSLayer::init() {
 
     bg->setPosition(winSize / 2);
     bg->setContentHeight(252);
-    bg->setContentWidth(380);
+    bg->setContentWidth(364);
     bg->setOpacity(135);
     bg->setPositionY(bg->getPositionY() - 15);
 
@@ -113,7 +113,7 @@ bool TWSLayer::init() {
     );
     nextPage->setAnchorPoint({0, .5});
     pagesMenu->addChild(nextPage);
-    nextPage->setPosition(ccp(outline->getContentSize().width + 1.5, (outline->getContentHeight() / 2) - 7));
+    nextPage->setPosition(ccp(outline->getContentSize().width - 4, (outline->getContentHeight() / 2) - 7));
     //nextPage->setVisible(false);
 
     auto prevPageSpr = CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png");
@@ -124,7 +124,7 @@ bool TWSLayer::init() {
     );
     prevPage->setAnchorPoint({1, .5});
     pagesMenu->addChild(prevPage);
-    prevPage->setPosition({-3.5, (outline->getContentHeight() / 2) - 7});
+    prevPage->setPosition({6, (outline->getContentHeight() / 2) - 7});
     prevPage->setVisible(false);
     
     pagesMenu->setContentSize(outline->getContentSize());
@@ -205,10 +205,10 @@ bool TWSLayer::init() {
     featuredBtn->setPosition(ccp(director->getScreenLeft() + 25, director->getScreenBottom() + 25));*/
     // big yahu save me bro
 
-    scroll = ScrollLayer::create(ccp(313, 180));
+    scroll = ScrollLayer::create(ccp(313, 187));
     scroll->setAnchorPoint(ccp(0, 0));
     scroll->ignoreAnchorPointForPosition(false);
-    scroll->setZOrder(-1);
+    scroll->setZOrder(-2);
     scroll->setPosition(8, 8);
 
     outline->addChild(scroll);
@@ -251,29 +251,124 @@ bool TWSLayer::init() {
         }
     })").unwrap();*/
     boobs::search = "";
+    boobs::creatorSearch = "";
     boobs::page = 1;
 
     getTexturePacks(boobs::search); // web web web sahur
     getTexturePacksCount(boobs::search); // web web web sahur the 2
 
-    inp = TextInput::create(300, "Search", "bigFont.fnt");
+    inp = TextInput::create(414, "Search", "bigFont.fnt");
     inp->setContentHeight(20);
-    inp->setAnchorPoint(ccp(0, 0));
+    inp->setAnchorPoint(ccp(0, 0.5));
     inp->ignoreAnchorPointForPosition(false); 
     this->outline->addChild(inp);
 
-    inp->setPosition(ccp(6, 194.2));
+    inp->setPosition(ccp(18, 208));
     inp->hideBG();
+    inp->setScale(0.7); // this is so fucking scuffed dude but i guess it works
     auto inputNode = inp->getInputNode();
+    inputNode->setTag(12);
     inputNode->setPositionY(inputNode->getPositionY() - 5);
     inputNode->setPositionX(5);
     inputNode->m_textLabel->setAnchorPoint(ccp(0, 0.5));
-    inputNode->m_textLabel->setScale(0.5);
+    inputNode->m_textLabel->setScale(0.6);
     inp->setDelegate(this);
     inp->setCommonFilter(CommonFilter::Any);
 
-    /*auto inpMenu = CCMenu::create();
+    filterPopdown = CCSprite::createWithSpriteFrameName("TWS_FiltersPopdown.png"_spr);
+    this->outline->addChild(filterPopdown);
+    filterPopdown->setZOrder(-1);
+    filterPopdown->setPosition({outline->getContentWidth() / 2, (outline->getContentHeight() / 2) + 82}); // -26 to normal
+    filterPopdown->setID("screw-you-tms-devs-you-aint-got-shit-on-me"_spr);
+    filterPopdown->setScaleX(0.975);
+
+    filterMenu = CCMenu::create();
+    filterPopdown->addChild(filterMenu);
+    filterMenu->setContentSize(filterPopdown->getContentSize());
+    filterMenu->setPosition(filterPopdown->getContentSize() / 2);
+
+    creatorInp = TextInput::create(85, "Creator", "bigFont.fnt");
+    creatorInp->setTag(13);
+    creatorInp->setDelegate(this);
+    creatorInp->setCommonFilter(CommonFilter::Any);
+    creatorInp->setScale(0.675);
+    filterMenu->addChild(creatorInp);
+    creatorInp->getInputNode()->setTag(13);
+    creatorInp->setPositionX(113);
+    creatorInp->setZOrder(1);
+
+    auto fuckTouchPrio = CCSprite::createWithSpriteFrameName("TWS_ButtonLarge.png"_spr);
+    fuckTouchPrio->setScaleX(0.8);
+    auto fuckTouchPrioBtn = CCMenuItemSpriteExtra::create(
+        fuckTouchPrio,
+        this,
+        menu_selector(TWSLayer::onRefresh)
+    );
+    filterMenu->addChild(fuckTouchPrioBtn);
+    fuckTouchPrioBtn->setPositionX(113);
+    fuckTouchPrio->setOpacity(0); // genuinely the most scuffed thing i have ever done but if it gets the job done it works for me
+
+    auto buttonSpr1 = CCSprite::createWithSpriteFrameName("TWS_ButtonLarge.png"_spr);
+    auto featuredSpr = CCSprite::createWithSpriteFrameName("GJ_sStarsIcon_001.png");
+    buttonSpr1->addChild(featuredSpr);
+    featuredSpr->setPosition(ccp(buttonSpr1->getContentSize().width / 2, buttonSpr1->getContentSize().height / 2));
+    auto featuredBtn = CCMenuItemSpriteExtra::create(
+        buttonSpr1,
+        this,
+        menu_selector(TWSLayer::onSort)
+    );
+    featuredBtn->setID("featured-button");
+    filterMenu->addChild(featuredBtn, 1);
+    featuredBtn->setPositionX(-109);
+    featuredBtn->setTag(1);
+
+    auto buttonSpr2 = CCSprite::createWithSpriteFrameName("TWS_ButtonLarge.png"_spr);
+    auto downloadsSpr = CCSprite::createWithSpriteFrameName("GJ_sDownloadIcon_001.png");
+    buttonSpr2->addChild(downloadsSpr);
+    downloadsSpr->setPosition(ccp(buttonSpr2->getContentSize().width / 2, buttonSpr2->getContentSize().height / 2));
+    auto downloadsBtn = CCMenuItemSpriteExtra::create(
+        buttonSpr2,
+        this,
+        menu_selector(TWSLayer::onSort)
+    );
+    downloadsBtn->setID("downloads-button");
+    filterMenu->addChild(downloadsBtn, 1);
+    downloadsBtn->setPositionX(-33);
+    downloadsBtn->setTag(2);
+
+    auto buttonSpr3 = CCSprite::createWithSpriteFrameName("TWS_ButtonLarge.png"_spr);
+    auto recentSpr = CCSprite::createWithSpriteFrameName("GJ_timeIcon_001.png");
+    recentSpr->setScale(0.65);
+    buttonSpr3->addChild(recentSpr);
+    recentSpr->setPosition(ccp(buttonSpr3->getContentSize().width / 2, buttonSpr3->getContentSize().height / 2));
+    auto recentBtn = CCMenuItemSpriteExtra::create(
+        buttonSpr3,
+        this,
+        menu_selector(TWSLayer::onSort)
+    );
+    recentBtn->setID("recent-button");
+    filterMenu->addChild(recentBtn, 1);
+    recentBtn->setPositionX(43);
+    recentBtn->setTag(3);
+
+    button1Selected = CCSprite::createWithSpriteFrameName("TWS_ButtonLargeSelected.png"_spr);
+    button2Selected = CCSprite::createWithSpriteFrameName("TWS_ButtonLargeSelected.png"_spr);
+    button3Selected = CCSprite::createWithSpriteFrameName("TWS_ButtonLargeSelected.png"_spr);
+    filterMenu->addChild(button1Selected);
+    button1Selected->setPositionX(-109);
+    filterMenu->addChild(button2Selected);
+    button2Selected->setPositionX(-33);
+    filterMenu->addChild(button3Selected);
+    button3Selected->setPositionX(43);
+    button1Selected->setVisible(boobs::featuredSort);
+    button2Selected->setVisible(boobs::downloadsSort);
+    button3Selected->setVisible(boobs::recentlyUpdatedSort);
+
+    filterMenu->setVisible(false);
+
+    auto inpMenu = CCMenu::create();
     inpMenu->setContentSize(inp->getContentSize());
+    inpMenu->setContentWidth(409);
     inp->addChild(inpMenu);
     
     
@@ -282,7 +377,7 @@ bool TWSLayer::init() {
     auto filterBtn = CCMenuItemSpriteExtra::create(
         filterSpr,
         this,
-        menu_selector(TWSLayer::onSort)
+        menu_selector(TWSLayer::onFilter)
     );
     inpMenu->addChild(filterBtn);
     inpMenu->setLayout(
@@ -291,7 +386,8 @@ bool TWSLayer::init() {
     );
     inpMenu->setPosition(inp->getContentSize() / 2);
     filterBtn->setPositionX(filterBtn->getPositionX() + 5);
-    inpMenu->setTouchPriority(-129);*/
+    inpMenu->setTouchPriority(-129);
+    inpMenu->updateLayout();
 
     return true;
 }
@@ -337,6 +433,27 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
             pos += 3;
         }
         url = fmt::format("{}&search={}", currentUrlStr, searchQuery);
+    }
+
+    if (!boobs::creatorSearch.empty()) {
+        std::string currentUrlStr = url;
+        size_t pos = 0;
+        while ((pos = boobs::creatorSearch.find(" ", pos)) != std::string::npos) {
+            boobs::creatorSearch.replace(pos, 1, "%20");
+            pos += 3;
+        }
+        url = fmt::format("{}&creator={}", currentUrlStr, boobs::creatorSearch);
+    }
+
+    if (boobs::featuredSort) {
+        std::string currentUrlStr = url;
+        url = fmt::format("{}&sort=featured", currentUrlStr);
+    } else if (boobs::downloadsSort) {
+        std::string currentUrlStr = url;
+        url = fmt::format("{}&sort=downloads", currentUrlStr);
+    } else if (boobs::recentlyUpdatedSort) {
+        std::string currentUrlStr = url;
+        url = fmt::format("{}&sort=recent", currentUrlStr);
     }
 
     //log::info("{}", Loader::get()->getGameVersion());
@@ -395,11 +512,26 @@ void TWSLayer::getTexturePacksCount(std::string searchQuery) {
         pageCountUrl = fmt::format("{}&search={}", currentPageUrlStr, searchQuery);
     }
 
+    if (!boobs::creatorSearch.empty()) {
+        std::string currentUrlStr = pageCountUrl;
+        size_t pos = 0;
+        while ((pos = boobs::creatorSearch.find(" ", pos)) != std::string::npos) {
+            boobs::creatorSearch.replace(pos, 1, "%20");
+            pos += 3;
+        }
+        pageCountUrl = fmt::format("{}&creator={}", currentUrlStr, boobs::creatorSearch);
+    }
+
+    if (boobs::featuredSort) {
+        std::string currentPageUrlStr = pageCountUrl;
+        pageCountUrl = fmt::format("{}&featured=1", currentPageUrlStr);
+    }
+
     m_getTPsCountlistener.spawn( 
         req2.get(pageCountUrl),
         [this](geode::utils::web::WebResponse res) {
-            log::debug("Response: {}", res.code());
-            log::debug("Body: {}", res.string().unwrap());
+            //log::debug("Response: {}", res.code());
+            //log::debug("Body: {}", res.string().unwrap());
             if (!res.ok() || res.json().unwrap()["success"].asBool().unwrap() == false) {
                 log::error("Failed to get TP count: {}", res.string().unwrap());
             } else {
@@ -491,7 +623,7 @@ void TWSLayer::setupTPCells() {
         }
 
         scroll->m_contentLayer->addChild(tpCell);
-        tpCell->setPosition(0, 314 - (35 * i));
+        tpCell->setPosition(11, 314 - (35 * i));
         tpCell->pagesMenu = pagesMenu;
         tpCell->inp = inp;
         i++;
@@ -529,7 +661,7 @@ void TWSLayer::onSupport(CCObject*) {
 void TWSLayer::onCredits(CCObject*) {
     FLAlertLayer::create(
         "Credits",
-        "<cg>Uproxide</c> - Main Developer\n<co>ShineUA, Alphalaneous and TheSillyDoggo</c> - Pull Requests :3\n<cr>M336</c> - Serverside Code\n<cl>Brift</c> - Main Sprite Creator\n<cl>Dremsk1y</c> - Sprites\n<cp>Riley</c> - she spenda the money (hosting)",
+        "~ Team <cg>Silly</c> <cp>Willies</c> ~\n<cg>Uproxide</c> and <cp>Riley</c>\n----------\n<co>ShineUA, Alphalaneous and TheSillyDoggo</c> - Contributors\n<cr>M336</c> - Serverside Code\n<cl>Brift and Dremsk1y</c> - Assets",
         "Ok"
     )->show();
 }
@@ -559,9 +691,37 @@ void TWSLayer::onNextPage(CCObject*) {
     getTexturePacksCount(boobs::search);
 }
 
-void TWSLayer::onSort(CCObject*) {
-    auto sortPopup = TWSFilters::create();
-    sortPopup->show();
+void TWSLayer::onSort(CCObject* sort) {
+    switch (sort->getTag())
+    {
+        case 1:
+            boobs::featuredSort = !boobs::featuredSort;
+            boobs::downloadsSort = false;
+            boobs::recentlyUpdatedSort = false;
+            break;
+
+        case 2:
+            boobs::downloadsSort = !boobs::downloadsSort;
+            boobs::featuredSort = false;
+            boobs::recentlyUpdatedSort = false;
+            break;
+
+        case 3:
+            boobs::recentlyUpdatedSort = !boobs::recentlyUpdatedSort;
+            boobs::featuredSort = false;
+            boobs::downloadsSort = false;
+            break;
+        
+        default:
+            break;
+    }
+
+    button1Selected->setVisible(boobs::featuredSort);
+    button2Selected->setVisible(boobs::downloadsSort);
+    button3Selected->setVisible(boobs::recentlyUpdatedSort);
+
+    getTexturePacks(boobs::search);
+    getTexturePacksCount(boobs::search);
 }
 
 void TWSLayer::onSearch(CCObject*) {
@@ -575,16 +735,44 @@ void TWSLayer::keyBackClicked() {
     onClose(nullptr);
 }
 
-void TWSLayer::textChanged(CCTextInputNode*) {
-    boobs::search = inp->getString();
+void TWSLayer::textChanged(CCTextInputNode* node) {
+    if (node->getTag() == 12) {
+        boobs::search = inp->getString();
 
-    this->unschedule(schedule_selector(TWSLayer::doThingIdrk));
-    this->scheduleOnce(schedule_selector(TWSLayer::doThingIdrk), 1.5f);
+        this->unschedule(schedule_selector(TWSLayer::doThingIdrk));
+        this->scheduleOnce(schedule_selector(TWSLayer::doThingIdrk), 1.5f);    
+    } else if (node->getTag() == 13) {
+        boobs::creatorSearch = creatorInp->getString();
+
+        this->unschedule(schedule_selector(TWSLayer::doThingIdrk));
+        this->scheduleOnce(schedule_selector(TWSLayer::doThingIdrk), 1.5f);   
+    }
+
 }
 
 void TWSLayer::doThingIdrk(float) {
     getTexturePacks(boobs::search);
     getTexturePacksCount(boobs::search);
+}
+
+void TWSLayer::onFilter(CCObject*) {
+    filtersDown = !filtersDown;
+    if (filtersDown) filterMenu->setVisible(true);
+    filterPopdown->runAction(
+        CCSequence::create(
+            CCEaseExponentialOut::create(
+                CCMoveBy::create(.5f, (filtersDown) ? ccp(0, -26) : ccp(0, 26))
+            ),
+            CCCallFunc::create(this, callfunc_selector(TWSLayer::onAnimFinish)),
+            nullptr
+        )
+    );
+}
+
+void TWSLayer::onAnimFinish() {
+    if (!filtersDown) {
+        filterMenu->setVisible(false);
+    }
 }
 
 TWSLayer::~TWSLayer()

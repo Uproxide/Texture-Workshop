@@ -13,6 +13,7 @@ class boobs {
         inline static int page = 1;
         inline static int tpCount = 0;
         inline static std::string search = "";
+        inline static std::string creatorSearch = "";
 
         inline static bool downloadsSort = false;
         inline static bool recentlyUpdatedSort = false;

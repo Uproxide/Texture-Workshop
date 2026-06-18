@@ -17,9 +17,11 @@ protected:
     ScrollLayer* scroll = nullptr;
 
     bool stupid = true;
+    bool filtersDown = false;
     
     CCScale9Sprite* bg;
     CCSprite* outline;
+    CCSprite* filterPopdown;
     CCLabelBMFont* pageCount;
     
     CCMenuItemSpriteExtra* refreshButton;
@@ -28,11 +30,17 @@ protected:
     CCMenuItemSpriteExtra* nextPage;
     CCMenuItemSpriteExtra* sortButton;
     CCMenu* buttonMenu;
+    CCMenu* filterMenu;
     std::string inputText;
     async::TaskHolder<geode::utils::web::WebResponse> m_getTPslistener;
     async::TaskHolder<geode::utils::web::WebResponse> m_getTPsCountlistener;
     CCMenu* pagesMenu = nullptr;
     TextInput* inp;
+    TextInput* creatorInp;
+
+    CCSprite* button1Selected;
+    CCSprite* button2Selected;
+    CCSprite* button3Selected;
 
     LoadingCircleSprite* loading;
 
@@ -76,4 +84,5 @@ public:
     void onPrevPage(CCObject*);
 
     void doThingIdrk(float);
+    void onAnimFinish();
 };

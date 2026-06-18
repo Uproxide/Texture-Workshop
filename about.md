@@ -21,11 +21,21 @@ go to the **#texture-packs forum channel** and **read FAQ**, then create a post 
 And that's about it! Wait until a **Texture Pack Mod** reviews your texture pack, and if they approve, it will be added!
 
 ## Credits
-- [Uproxide](user:25397826) (Code and everything else)
-- M336 (Server)
-- Alphalaneous, M336, TheSillyDoggo, ShineUA (Their PRs to TWS)
-- Riley (Emotional support)
-- Brift (Concept creator, sprites, and logo)
-- Dremsk1y_ (Sprites)
-- Jaid (Helped with the about.md || One of the main TP Mods)
-- Cheeseworks (john)
+~ Team Silly Willies ~
+Uproxide - Rileycolonthree
+
+~ Little Land Staff ~
+Uproxide* - Riley* - Jaid* ~ Big 3
+Slack* - Dremsk1y* - Brift ~ Admin
+Katniss* - arch.lynix ~ Moderator
+Sinc - Nova (Sayodiv) ~ Trial Moderator
+#### * - TP Moderators
+
+~ Contributors ~
+M336 -  Backend Code
+Brift, Dremsk1y - Assets
+ShineUA, Alphalaneous, TheSillyDoggo - Pull Requests
+
+~ Special Thanks ~
+All my friends for being there for me <3 
+Cheeseworks - john
