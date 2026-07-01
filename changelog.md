@@ -1,3 +1,6 @@
+# 2.1.2
+- Add error codes to errors (and update error position)
+
 # 2.1.1
  ## Additions
 - Filters

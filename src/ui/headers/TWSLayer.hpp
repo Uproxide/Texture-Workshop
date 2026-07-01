@@ -23,6 +23,7 @@ protected:
     CCSprite* outline;
     CCSprite* filterPopdown;
     CCLabelBMFont* pageCount;
+    CCLabelBMFont* errorText;
     
     CCMenuItemSpriteExtra* refreshButton;
     CCMenuItemSpriteExtra* searchBtn;

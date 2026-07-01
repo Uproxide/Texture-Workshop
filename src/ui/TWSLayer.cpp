@@ -403,8 +403,8 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
 
     //if (pagesMenu) pagesMenu->setVisible(false);
 
-    if (auto errorSlop = outline->getChildByID("error-text"_spr)) {
-        outline->removeChild(errorSlop, true);
+    if (errorText) {
+        outline->removeChild(errorText, true);
     }
 
     //if (nextPage && nextPage->isVisible()) nextPage->setVisible(false);
@@ -419,6 +419,8 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
     //log::info("{}", boobs::page);
 
     std::string url = fmt::format("https://textureworkshop.xyz/api/v2/tws/getTPs?page={}", boobs::page);
+
+    //std::string url = "https://tools-httpstatus.pickup-services.com/500"; // use this to test the error shit
 
     if (Mod::get()->getSettingValue<bool>("version-filter")) {
         std::string currentUrlStr = url;
@@ -465,11 +467,12 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
             //log::debug("Body: {}", value.string().unwrap());
             if (res.ok()) {
                 if (res.string().unwrap() == "{}") {
-                    auto errorText = CCLabelBMFont::create("No texture packs found!", "bigFont.fnt");
+                    errorText = CCLabelBMFont::create("No texture packs found!", "bigFont.fnt");
                     outline->addChild(errorText);
                     errorText->setScale(0.3);
                     errorText->setID("error-text"_spr);
-                    errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
+                    errorText->setPosition({ 22.5, 191.875});
+                    errorText->setAnchorPoint({ 0, 1 });
                     loading->setVisible(false);
                     nextPage->setVisible(false);
                     prevPage->setVisible(false);
@@ -479,14 +482,17 @@ void TWSLayer::getTexturePacks(std::string searchQuery) {
                     setupTPCells();
                 }
             } else {
-                auto errorText = CCLabelBMFont::create("Something went wrong while getting TPs!\nPlease try again later.", "bigFont.fnt");
+                if (errorText) errorText->removeMeAndCleanup();
+                errorText = CCLabelBMFont::create(fmt::format("Something went wrong while getting TPs!\nPlease try again later.\n\nError Code - {}", res.code()).c_str(), "bigFont.fnt");
                 outline->addChild(errorText);
                 errorText->setScale(0.3);
                 errorText->setID("error-text"_spr);
-                errorText->setPosition({ outline->getContentWidth() / 2, outline->getContentHeight() / 2 });
+                errorText->setPosition({ 22.5, 191.875});
+                errorText->setAnchorPoint({ 0, 1 });
                 loading->setVisible(false);
                 nextPage->setVisible(false);
                 prevPage->setVisible(false);
+                //inp->setVisible(false);
             }
         }
     );
@@ -758,6 +764,17 @@ void TWSLayer::doThingIdrk(float) {
 void TWSLayer::onFilter(CCObject*) {
     filtersDown = !filtersDown;
     if (filtersDown) filterMenu->setVisible(true);
+    if (errorText) {
+        errorText->runAction(
+            CCSequence::create(
+                CCEaseExponentialOut::create(
+                    CCMoveBy::create(.5f, (filtersDown) ? ccp(0, -26) : ccp(0, 26))
+                ),
+                nullptr
+            )
+        );
+    }
+
     filterPopdown->runAction(
         CCSequence::create(
             CCEaseExponentialOut::create(
