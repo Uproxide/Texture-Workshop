@@ -26,6 +26,10 @@
 		"geode.texture-loader": {
 			"required": true,
 			"version": ">=1.9.0"
+		},
+		"uproxide.happy_textures": {
+			"required": true,
+			"version": ">=2.1.11"
 		}
 	},
 	"settings": {
