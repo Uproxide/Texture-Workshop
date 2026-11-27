@@ -1,57 +1,60 @@
 {
-	"geode": "5.8.2",
-	"gd": {
-		"win": "2.2081",
-		"mac": "2.2081",
-		"ios": "2.2081",
-		"android": "2.2081"
-	},
-	"version": "v2.1.4",
-	"id": "uproxide.textures",
-	"name": "Texture Workshop",
-	"developer": "Uproxide",
-	"description": "An index for Texture Packs :)",
-	"resources": {
-		"spritesheets": {
-			"TWSSheet": [
-				"resources/TWSSheet/*.png"
-			]
-		},
-		"sprites": [
-			"resources/TWS_Box.png",
-			"resources/TWS_Cubes.png"
-		]
-	},
-	"dependencies": {
-		"geode.texture-loader": {
-			"required": true,
-			"version": ">=1.9.0"
-		},
-		"uproxide.happy_textures": {
-			"required": true,
-			"version": ">=2.1.11"
-		}
-	},
-	"settings": {
-		"cert-verification": {
-			"name": "Cert Verification",
-			"description": "Enable Cert Verification",
-			"type": "bool",
-			"default": true
-		},
-
-		"version-filter": {
-			"name": "Version Filter",
-			"description": "Filter TPs to only show TPs that support the current GD Version",
-			"type": "bool",
-			"default": true
-		}
-	},
-	"tags": [
-		"universal", "utility", "interface", "enhancement", "customization"
-	],
-	"links": {
-		"community": "https://discord.gg/uproxide-s-little-land-1204580412299542608",
-		"source": "https://github.com/Uproxide/Texture-Workshop"
-	}
+  "geode": "6.0.0",
+  "gd": {
+    "win": "2.2091",
+    "mac": "2.2091",
+    "ios": "2.2091",
+    "android": "2.2091"
+  },
+  "version": "v2.1.5",
+  "id": "uproxide.textures",
+  "name": "Texture Workshop",
+  "developer": "Uproxide",
+  "description": "An index for Texture Packs :)",
+  "resources": {
+    "spritesheets": {
+      "TWSSheet": [
+        "resources/TWSSheet/*.png"
+      ]
+    },
+    "sprites": [
+      "resources/TWS_Box.png",
+      "resources/TWS_Cubes.png"
+    ]
+  },
+  "dependencies": {
+    "geode.texture-loader": {
+      "required": true,
+      "version": ">=1.9.0"
+    },
+    "uproxide.happy_textures": {
+      "required": true,
+      "version": ">=2.1.11"
+    }
+  },
+  "settings": {
+    "cert-verification": {
+      "name": "Cert Verification",
+      "description": "Enable Cert Verification",
+      "type": "bool",
+      "default": true
+    },
+    "version-filter": {
+      "name": "Version Filter",
+      "description": "Filter TPs to only show TPs that support the current GD Version",
+      "type": "bool",
+      "default": true
+    }
+  },
+  "tags": [
+    "universal",
+    "utility",
+    "interface",
+    "enhancement",
+    "customization"
+  ],
+  "links": {
+    "community": "https://discord.gg/uproxide-s-little-land-1204580412299542608",
+    "source": "https://github.com/Uproxide/Texture-Workshop"
+  }
 }
